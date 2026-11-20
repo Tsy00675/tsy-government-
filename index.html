@@ -1,0 +1,2552 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ระบบจัดทำบันทึกข้อความขออนุญาตเดินทางไปราชการ (A4 100%)</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ui-font: 'Kanit', sans-serif;
+      --doc-font: 'Sarabun', 'TH SarabunPSK', sans-serif;
+    }
+
+    body {
+      font-family: var(--ui-font);
+      background-color: #f1f5f9;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    /* Official A4 Paper Styling — Uniform 14px body font */
+    .a4-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      max-height: 297mm;
+      background: #ffffff;
+      color: #000000;
+      font-family: var(--doc-font);
+      font-size: 14px;
+      line-height: 1.5;
+      padding: 12mm 16mm 10mm 20mm;
+      box-sizing: border-box;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+      margin: 0 auto 24px auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .a4-sheet * {
+      font-size: 14px;
+    }
+    .doc-row > span:not(.dotted-flex):not(.dotted-flex-left):not(.dotted-fill) {
+      white-space: nowrap;
+    }
+
+    .doc-garuda {
+      width: 15.5mm;
+      height: auto;
+      display: block;
+    }
+
+    /* Keep "บันทึกข้อความ" at original large official size */
+    .a4-sheet .doc-title {
+      font-size: 25pt !important;
+      font-weight: 700;
+      line-height: 1.1;
+      text-align: center;
+      letter-spacing: 0.3px;
+    }
+
+    .doc-label-bold {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .doc-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-bottom: 4px;
+      width: 100%;
+    }
+
+    .dotted-fill {
+      display: inline-block;
+      border-bottom: 1px dotted #111827;
+      padding: 0 4px;
+      line-height: 1.25;
+      vertical-align: baseline;
+      text-align: center;
+      font-weight: 400;
+    }
+
+    .dotted-fill-left {
+      display: inline-block;
+      border-bottom: 1px dotted #111827;
+      padding: 0 4px;
+      line-height: 1.25;
+      vertical-align: baseline;
+      text-align: left;
+    }
+
+    .dotted-flex {
+      flex: 1;
+      min-width: 16mm;
+      border-bottom: 1px dotted #111827;
+      padding: 0 5px;
+      line-height: 1.25;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .dotted-flex-left {
+      flex: 1;
+      min-width: 16mm;
+      border-bottom: 1px dotted #111827;
+      padding: 0 5px;
+      line-height: 1.25;
+      text-align: left;
+    }
+
+    .dotted-flex-fixed {
+      flex: 1;
+      min-width: 16mm;
+      border-bottom: 1px dotted #111827;
+      padding: 0 5px;
+      line-height: 1.25;
+      text-align: left;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+
+
+    .doc-checkbox {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 13px;
+      height: 13px;
+      border: 1.2px solid #000;
+      margin-right: 5px;
+      font-size: 11px !important;
+      line-height: 1;
+      vertical-align: middle;
+      position: relative;
+      top: -1px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 1280px) {
+      .preview-viewport {
+        overflow-x: auto;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Overlay Print Mode: พิมพ์เฉพาะรายชื่อเพิ่มลงบนกระดาษเดิม */
+    .a4-sheet.overlay-mode > *:not(#v_teamListBlock),
+    .a4-sheet.overlay-mode .overlay-ghost,
+    .a4-sheet.overlay-mode .overlay-num-ghost {
+      opacity: 0.14;
+    }
+    .a4-sheet.overlay-mode .overlay-ghost-line {
+      border-bottom-color: rgba(17, 24, 39, 0.15) !important;
+    }
+    @media print {
+      .a4-sheet.overlay-mode > *:not(#v_teamListBlock),
+      .a4-sheet.overlay-mode .overlay-ghost,
+      .a4-sheet.overlay-mode .overlay-num-ghost {
+        visibility: hidden !important;
+        opacity: 0 !important;
+      }
+      .a4-sheet.overlay-mode .overlay-ghost-line {
+        border-bottom-color: transparent !important;
+      }
+    }
+
+    /* Print Exact A4 Rules */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      html, body, main {
+        display: block !important;
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 210mm !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-area {
+        display: block !important;
+        width: 210mm !important;
+        height: auto !important;
+        max-height: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+      }
+      .a4-sheet {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: 296mm !important;
+        padding: 12mm 16mm 10mm 20mm !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .a4-sheet:not(.hidden-sheet) + .a4-sheet:not(.hidden-sheet) {
+        page-break-before: always;
+        break-before: page;
+      }
+      .a4-sheet.hidden-sheet {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top App Bar (Hidden on Print) -->
+  <header class="no-print sticky top-0 z-30 bg-emerald-700 text-white shadow-md">
+    <div class="max-w-[1600px] mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-white/15 flex items-center justify-center font-bold text-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-semibold leading-tight">ระบบขออนุญาตเดินทางไปราชการ (A4 100%)</h1>
+          <p class="text-xs text-emerald-100 flex items-center gap-1.5">
+            <span>สสอ.ท่าสองยาง • ฟอนต์ 14px</span>
+            <span id="sheetStatusBadge" class="px-1.5 py-0.5 rounded bg-emerald-900/60 text-[10px]">Sheet ID: 1FnZ5j...QRGQ</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Mobile Tab Switcher -->
+        <div class="flex lg:hidden bg-emerald-800/70 rounded-lg p-0.5 text-xs">
+          <button id="tabEditorBtn" type="button" class="px-3 py-1.5 rounded-md bg-white text-emerald-800 font-medium transition">กรอกข้อมูล</button>
+          <button id="tabPreviewBtn" type="button" class="px-3 py-1.5 rounded-md text-emerald-100 font-medium transition">ดูตัวอย่าง A4</button>
+        </div>
+
+        <select id="sheetModeSelect" class="bg-emerald-800 border border-emerald-500/50 text-white text-xs sm:text-sm rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-white/40">
+          <option value="form1">เฉพาะขอไปราชการ (1 หน้า)</option>
+          <option value="both">ไปราชการ + รถยนต์ส่วนตัว (2 หน้า)</option>
+          <option value="form1_3">ไปราชการ + ใช้รถราชการ (2 หน้า)</option>
+          <option value="form2">เฉพาะขอใช้รถยนต์ส่วนตัว (1 หน้า)</option>
+          <option value="form3">เฉพาะใบขอรถยนต์ราชการ (1 หน้า)</option>
+        </select>
+
+        <button id="btnSaveRecord" type="button" class="px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-300 text-slate-900 text-xs sm:text-sm font-semibold transition flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+          </svg>
+          บันทึกลง Sheet
+        </button>
+
+        <button id="btnHistory" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-medium border border-emerald-400/40 transition">
+          ประวัติ (<span id="historyCount">0</span>)
+        </button>
+
+        <button id="btnSettings" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-800 hover:bg-emerald-900 text-xs sm:text-sm font-medium border border-emerald-500/50 transition flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          ตั้งค่า
+        </button>
+
+        <button id="btnLoadSample" type="button" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs sm:text-sm font-medium border border-emerald-400/40 transition">
+          โหลดตัวอย่าง
+        </button>
+        <button id="btnClearForm" type="button" class="px-3 py-1.5 rounded-lg bg-rose-600/90 hover:bg-rose-500 text-xs sm:text-sm font-medium transition">
+          ล้างข้อมูล
+        </button>
+        <button id="btnPrintPdf" type="button" class="px-4 py-1.5 rounded-lg bg-white text-emerald-800 hover:bg-emerald-50 text-xs sm:text-sm font-semibold shadow-sm flex items-center gap-1.5 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          พิมพ์ / บันทึก PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- History Modal (Hidden by default) -->
+  <div id="historyModal" class="no-print fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-3.5 bg-emerald-700 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-semibold text-base">ประวัติรายการขออนุญาตไปราชการ</h3>
+          <p class="text-xs text-emerald-100">Google Sheet ID: 1FnZ5jnK0dmdlckEY_QFXj29EKlM88ibueZk7_OWQRGQ</p>
+        </div>
+        <button id="btnCloseHistory" type="button" class="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-lg">&times;</button>
+      </div>
+      <div id="historyList" class="p-4 overflow-y-auto space-y-2.5 flex-1 bg-slate-50"></div>
+    </div>
+  </div>
+
+  <!-- Settings Modal: เพิ่มส่วนราชการและเลขที่หนังสือ -->
+  <div id="settingsModal" class="no-print fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-3.5 bg-emerald-700 text-white flex items-center justify-between">
+        <div>
+          <h3 class="font-semibold text-base">ตั้งค่าส่วนราชการและเลขที่หนังสือ</h3>
+          <p class="text-xs text-emerald-100">เพิ่มหน่วยงานไว้เลือกใช้งานด่วนได้</p>
+        </div>
+        <button id="btnCloseSettings" type="button" class="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-lg">&times;</button>
+      </div>
+      <div class="p-4 space-y-3 border-b border-slate-200 bg-slate-50">
+        <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 space-y-1.5">
+          <label class="block text-xs font-semibold text-emerald-900">ลิงก์ Google Apps Script Web App (/exec) สำหรับรันบน GitHub</label>
+          <div class="flex gap-2">
+            <input id="gasApiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 rounded-lg border border-emerald-300 px-2.5 py-1 text-xs bg-white focus:border-emerald-500 outline-none" />
+            <button id="btnSaveGasUrl" type="button" class="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-medium shrink-0">บันทึกลิงก์</button>
+          </div>
+          <p class="text-[10px] text-emerald-700">หากเปิดผ่าน Apps Script โดยตรงไม่ต้องกรอก • หากฝากไฟล์บน GitHub Pages ให้วางลิงก์ /exec เพื่อเชื่อมต่อ Google Sheet</p>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อส่วนราชการ (รวมที่อยู่/เบอร์โทร)</label>
+          <input id="newAgencyName" type="text" placeholder="เช่น รพ.สต.บ้าน... อ.ท่าสองยาง จ.ตาก โทร. ..." class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white focus:border-emerald-500 outline-none" />
+        </div>
+        <div class="flex items-end gap-2">
+          <div class="flex-1">
+            <label class="block text-xs font-medium text-slate-600 mb-1">เลขที่ของส่วนราชการ (เช่น ตก 0533/)</label>
+            <input id="newAgencyDocNo" type="text" placeholder="เช่น ตก 0533.01/" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white focus:border-emerald-500 outline-none" />
+          </div>
+          <button id="btnAddAgency" type="button" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium shrink-0">+ เพิ่มส่วนราชการ</button>
+        </div>
+      </div>
+      <div id="agencySettingsList" class="p-4 overflow-y-auto space-y-2 flex-1 bg-white"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastBox" class="no-print fixed bottom-4 right-4 z-50 hidden bg-slate-900 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toastMsg">บันทึกข้อมูลเรียบร้อย</span>
+  </div>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto flex flex-col lg:flex-row gap-4 p-3 sm:p-4">
+
+    <!-- LEFT PANEL: Form Input Editor -->
+    <section id="editorPanel" class="no-print w-full lg:w-[460px] xl:w-[500px] shrink-0 space-y-4 lg:max-h-[calc(100vh-84px)] lg:overflow-y-auto pr-0 lg:pr-1">
+
+      <!-- Mode Selector Card -->
+      <div class="bg-white rounded-xl border border-emerald-200 shadow-sm p-3 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-emerald-800">เลือกรูปแบบเอกสารที่จะสร้าง/พิมพ์</span>
+          <span id="modeBadge" class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-medium">1 หน้า (A4)</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+          <button type="button" data-mode-btn="form1" class="mode-btn px-2 py-2 rounded-lg border font-medium text-center transition bg-emerald-600 text-white border-emerald-600">
+            ไปราชการอย่างเดียว
+          </button>
+          <button type="button" data-mode-btn="both" class="mode-btn px-2 py-2 rounded-lg border font-medium text-center transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+            + รถส่วนตัว (2 หน้า)
+          </button>
+          <button type="button" data-mode-btn="form1_3" class="mode-btn px-2 py-2 rounded-lg border font-medium text-center transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+            + รถราชการ (2 หน้า)
+          </button>
+          <button type="button" data-mode-btn="form2" class="mode-btn px-2 py-2 rounded-lg border font-medium text-center transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100">
+            เฉพาะรถส่วนตัว
+          </button>
+          <button type="button" data-mode-btn="form3" class="mode-btn px-2 py-2 rounded-lg border font-medium text-center transition bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 col-span-2 sm:col-span-2">
+            เฉพาะใบขอรถยนต์ราชการ
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 1: ข้อมูลหัวบันทึกข้อความ -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">1</span>
+            ข้อมูลหัวบันทึกข้อความ
+          </h2>
+          <span class="text-[11px] text-slate-400">ใช้ร่วมกันทั้ง 2 ฟอร์ม</span>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <label class="text-xs font-medium text-slate-600 shrink-0">ส่วนราชการ</label>
+            <div class="relative flex-1 max-w-[260px]">
+              <input id="agencySearchInput" type="text" placeholder="พิมพ์ค้นหาส่วนราชการ / เลขที่..." autocomplete="off" class="w-full rounded border border-emerald-200 bg-emerald-50/70 text-emerald-900 px-2.5 py-0.5 text-[11px] focus:border-emerald-500 focus:bg-white outline-none" />
+              <div id="agencyDropdownList" class="hidden absolute right-0 left-0 top-full mt-1 z-40 bg-white border border-slate-200 rounded-lg shadow-lg max-h-48 overflow-y-auto divide-y divide-slate-100"></div>
+            </div>
+          </div>
+          <input data-field="agency" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ที่ (เลขหนังสือ)</label>
+            <input data-field="docNo" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">วันที่</label>
+            <input data-field="docDate" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          </div>
+        </div>
+
+        <div id="subject1Wrap">
+          <label class="block text-xs font-medium text-slate-600 mb-1">เรื่อง (แบบที่ 1)</label>
+          <input data-field="subject1" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          <div class="flex flex-wrap gap-1.5 mt-1.5">
+            <button type="button" data-preset="travel_only" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">ไปราชการอย่างเดียว</button>
+            <button type="button" data-preset="travel_govcar" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">+ ขอใช้รถราชการ</button>
+            <button type="button" data-preset="travel_private" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">+ ขอใช้รถส่วนตัว</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">เรียน</label>
+          <input data-field="recipient" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+        </div>
+      </div>
+
+      <!-- Card 2: ผู้ขออนุญาตและคณะเดินทาง -->
+      <div id="cardForm1Team" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">2</span>
+            ผู้ขออนุญาตและคณะเดินทาง
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อ-สกุล ผู้ขออนุญาต</label>
+            <input data-field="requesterName" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ตำแหน่ง</label>
+            <input data-field="requesterPos" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">กลุ่มงาน</label>
+            <input data-field="department" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">รวมคณะ (คน)</label>
+            <input data-field="teamCount" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-medium text-slate-600">รายชื่อคณะเดินทาง (แสดง 10 คน / กดเพิ่มได้)</label>
+            <div class="flex items-center gap-2">
+              <button id="btnClearTeam" type="button" class="text-[11px] text-rose-600 hover:underline">ไม่ไปเป็นคณะ</button>
+              <button id="btnAddTeam" type="button" class="text-[11px] px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-medium">+ เพิ่มคน</button>
+            </div>
+          </div>
+          <div class="mb-2 p-2.5 rounded-lg bg-amber-50 border border-amber-200 flex items-center justify-between gap-2">
+            <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-medium text-amber-900">
+              <input id="chkOverlayMode" type="checkbox" class="rounded text-amber-600 focus:ring-amber-500" />
+              <span>โหมดพิมพ์ชื่อเพิ่มลงกระดาษเดิม (ซ่อนข้อความทั้งหมด)</span>
+            </label>
+          </div>
+          <div id="overlayHint" class="hidden mb-2 text-[11px] text-amber-800 bg-amber-50/60 px-2.5 py-1.5 rounded border border-amber-100">
+            ติ๊กช่อง <span class="font-semibold">พิมพ์</span> หน้าชื่อที่ต้องการเพิ่มลงกระดาษเดิม ระบบจะซ่อนข้อความและเส้นประทั้งหมดตอนสั่งพิมพ์ให้ตรงตำแหน่งเป๊ะ
+          </div>
+          <div id="teamEditorList" class="space-y-1.5"></div>
+        </div>
+      </div>
+
+      <!-- Card 3: รายละเอียดการไปราชการ (แบบที่ 1) -->
+      <div id="cardForm1Detail" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">3</span>
+            รายละเอียดการไปราชการ (แบบที่ 1)
+          </h2>
+        </div>
+
+        <div class="flex flex-wrap gap-4 text-xs">
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <input data-check="purposeTravel" type="checkbox" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <span>ขออนุมัติเดินทางไปราชการ</span>
+          </label>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <input data-check="purposeGovCar" type="checkbox" class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <span>และขออนุมัติใช้รถราชการ</span>
+          </label>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">เข้าร่วมประชุม/อบรม/สัมมนา/ศึกษาดูงาน เรื่อง</label>
+          <textarea data-field="eventTitle" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ระหว่างวันที่</label>
+            <input data-field="eventDates" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ณ (สถานที่)</label>
+            <input data-field="eventPlace" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">อำเภอ</label>
+            <input data-field="eventDistrict" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">จังหวัด</label>
+            <input data-field="eventProvince" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">จัดโดย</label>
+            <input data-field="organizer" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ตามหนังสือที่</label>
+            <input data-field="refDocNo" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ลงวันที่</label>
+            <input data-field="refDocDate" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ออกเดินทางวันที่</label>
+            <input data-field="departDate" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">เวลาออก</label>
+            <input data-field="departTime" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">เดินทางกลับวันที่</label>
+            <input data-field="returnDate" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs focus:border-emerald-500 outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">เวลากลับ</label>
+            <input data-field="returnTime" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs focus:border-emerald-500 outline-none" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: พาหนะเดินทางและงบประมาณ -->
+      <div id="cardForm1Veh" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">4</span>
+            พาหนะและค่าใช้จ่าย
+          </h2>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input data-check="vehGovCar" type="checkbox" class="rounded text-emerald-600" />
+              <span>รถยนต์ราชการ ทะเบียน</span>
+            </label>
+            <input data-field="govCarPlate" placeholder="ทะเบียนรถ" type="text" class="w-28 rounded border border-slate-300 px-2 py-1 text-xs" />
+            <span>พขร.</span>
+            <input data-field="govDriver" placeholder="ชื่อพนักงานขับรถ" type="text" class="flex-1 min-w-[120px] rounded border border-slate-300 px-2 py-1 text-xs" />
+          </div>
+
+          <div class="flex flex-wrap gap-4">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input data-check="vehBus" type="checkbox" class="rounded text-emerald-600" />
+              <span>รถยนต์โดยสารปรับอากาศประจำทาง</span>
+            </label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input data-check="vehMoto" type="checkbox" class="rounded text-emerald-600" />
+              <span>รถจักรยานยนต์</span>
+            </label>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input data-check="vehPrivate" type="checkbox" class="rounded text-emerald-600" />
+              <span>รถยนต์ส่วนบุคคล ทะเบียน</span>
+            </label>
+            <input data-field="privateCarPlate" placeholder="เช่น กฉ 7768 ตาก" type="text" class="w-32 rounded border border-slate-300 px-2 py-1 text-xs" />
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input data-check="vehOther" type="checkbox" class="rounded text-emerald-600" />
+              <span>อื่นๆ ระบุ</span>
+            </label>
+            <input data-field="vehOtherText" placeholder="เช่น เครื่องบิน" type="text" class="flex-1 rounded border border-slate-300 px-2 py-1 text-xs" />
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">ขออนุมัติเบิกค่าใช้จ่ายจาก</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expCentral" type="checkbox" class="rounded text-emerald-600" /><span>งบกลาง</span></label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expPho" type="checkbox" class="rounded text-emerald-600" /><span>สสจ.ตาก</span></label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expOrganizer" type="checkbox" class="rounded text-emerald-600" /><span>งบผู้จัด</span></label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expProject" type="checkbox" class="rounded text-emerald-600" /><span>งบโครงการของฝ่าย</span></label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expNone" type="checkbox" class="rounded text-emerald-600" /><span>ไม่ขอเบิก</span></label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expMaintenance" type="checkbox" class="rounded text-emerald-600" /><span>เงินบำรุง</span></label>
+          </div>
+          <div class="flex items-center gap-2 mt-2 text-xs">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer"><input data-check="expOther" type="checkbox" class="rounded text-emerald-600" /><span>อื่นๆ</span></label>
+            <input data-field="expOtherText" placeholder="ระบุแหล่งงบประมาณอื่น" type="text" class="flex-1 rounded border border-slate-300 px-2 py-1 text-xs" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: ผู้ตรวจสอบ หัวหน้างาน และผู้อนุมัติ -->
+      <div id="cardForm1Sign" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">5</span>
+            ผู้ลงนามและผู้อนุมัติ
+          </h2>
+          <label class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 cursor-pointer">
+            <input data-check="showApprover" type="checkbox" checked class="rounded text-emerald-600 focus:ring-emerald-500" />
+            <span>แสดงส่วน "อนุมัติ"</span>
+          </label>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ผู้ตรวจสอบ</label>
+            <input data-field="reviewerName" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ตำแหน่งผู้ตรวจสอบ</label>
+            <input data-field="reviewerPos" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">หัวหน้างาน/ฝ่าย</label>
+            <input data-field="headName" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ตำแหน่งหัวหน้างาน</label>
+            <input data-field="headPos" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ผู้อนุมัติ</label>
+            <input data-field="approverName" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ตำแหน่งผู้อนุมัติ</label>
+            <input data-field="approverPos" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: ข้อมูลแบบที่ 2 (ขออนุญาตใช้รถยนต์ส่วนตัว) -->
+      <div id="cardForm2" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">6</span>
+            แบบที่ 2: ขออนุญาตใช้รถยนต์ส่วนตัว
+          </h2>
+          <button id="btnSyncFromForm1" type="button" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">ดึงข้อมูลจากแบบที่ 1</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">วันที่ (แบบที่ 2)</label>
+            <input data-field="p2Date" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ยี่ห้อรถยนต์ส่วนตัว</label>
+            <input data-field="carBrand" placeholder="เช่น MAZDA" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ได้รับคำสั่ง/บันทึก</label>
+            <input data-field="p2OrderNo" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ลงวันที่</label>
+            <input data-field="p2OrderDate" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">ให้ข้าพเจ้าเดินทางไปราชการ (เรื่อง/รายละเอียด)</label>
+          <textarea data-field="p2EventTitle" rows="2" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">ที่ (สถานที่)</label>
+          <input data-field="p2Place" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ระหว่างวันที่</label>
+            <input data-field="p2StartDate" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ถึงวันที่</label>
+            <input data-field="p2EndDate" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">เหตุผลใช้รถยนต์ส่วนตัวเพื่อ</label>
+          <input data-field="p2Reason" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ระยะทางจาก</label>
+            <input data-field="originPlace" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ถึง</label>
+            <input data-field="destPlace" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div class="p-3 bg-emerald-50/70 rounded-lg border border-emerald-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-emerald-800">คำนวณค่าชดเชยน้ำมัน (กม. ละ 4 บาท)</span>
+            <label class="inline-flex items-center gap-1 text-[11px] text-emerald-700 cursor-pointer">
+              <input id="autoCalcFuel" type="checkbox" checked class="rounded text-emerald-600" />
+              <span>คำนวณอัตโนมัติ</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[11px] text-slate-600 mb-0.5">เที่ยวเดียว (กม.)</label>
+              <input data-field="oneWayKm" type="number" min="0" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-600 mb-0.5">ไป-กลับ (กม.)</label>
+              <input data-field="roundTripKm" type="text" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+            </div>
+            <div>
+              <label class="block text-[11px] text-slate-600 mb-0.5">รวมเป็นเงิน (บาท)</label>
+              <input data-field="fuelAmount" type="text" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white font-semibold text-emerald-700" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-600 mb-0.5">จำนวนเงินตัวอักษร</label>
+            <input data-field="fuelAmountText" type="text" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7: แบบที่ 3 (ใบอนุญาตใช้รถส่วนกลาง / รถรับรอง) -->
+      <div id="cardForm3" class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-3 hidden">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h2 class="text-sm font-semibold text-emerald-800 flex items-center gap-2">
+            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">7</span>
+            แบบที่ 3: ใบขออนุญาตใช้รถยนต์ราชการ
+          </h2>
+          <div class="flex items-center gap-2">
+            <label class="inline-flex items-center gap-1 text-[11px] text-emerald-700 cursor-pointer">
+              <input id="autoSyncForm3" type="checkbox" checked class="rounded text-emerald-600" />
+              <span>ดึงอัตโนมัติ</span>
+            </label>
+            <button id="btnSyncForm3" type="button" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">ดึงข้อมูลตอนนี้</button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3 text-xs">
+          <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3InProv" type="checkbox" class="rounded text-emerald-600" /><span>ในจังหวัด</span></label>
+          <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3OutProv" type="checkbox" class="rounded text-emerald-600" /><span>นอกจังหวัด</span></label>
+          <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3Normal" type="checkbox" class="rounded text-emerald-600" /><span>แผนปกติ</span></label>
+          <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3Urgent" type="checkbox" class="rounded text-emerald-600" /><span>แผนด่วน</span></label>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">วันที่</label>
+            <input data-field="p3Day" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">เดือน</label>
+            <input data-field="p3Month" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">พ.ศ.</label>
+            <input data-field="p3Year" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">ขออนุญาตใช้รถยนต์ (ไปไหน)</label>
+          <input data-field="p3Dest" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">เพื่อ</label>
+            <input data-field="p3Purpose" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">จำนวนนั่ง (คน)</label>
+            <input data-field="p3Seats" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ในวันที่</label>
+            <input data-field="p3StartDate" type="text" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">เวลา (น.)</label>
+            <input data-field="p3StartTime" type="text" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ถึงวันที่</label>
+            <input data-field="p3EndDate" type="text" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">เวลา (น.)</label>
+            <input data-field="p3EndTime" type="text" class="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-xs" />
+          </div>
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          <label class="block font-medium text-slate-600">ประเภทการเบิกจ่ายน้ำมัน</label>
+          <div class="flex flex-wrap gap-3">
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3FuelCentral" type="checkbox" class="rounded text-emerald-600" /><span>งบกลาง</span></label>
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3FuelProject" type="checkbox" class="rounded text-emerald-600" /><span>งบโครงการ</span></label>
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3FuelOrg" type="checkbox" class="rounded text-emerald-600" /><span>งบผู้จัด</span></label>
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3FuelOther" type="checkbox" class="rounded text-emerald-600" /><span>อื่น ๆ</span></label>
+          </div>
+          <input data-field="p3FuelOtherText" placeholder="ระบุงบประมาณอื่น ๆ (ถ้ามี)" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1 text-xs" />
+        </div>
+
+        <div class="space-y-1.5 text-xs">
+          <label class="block font-medium text-slate-600">พนักงานขับรถ</label>
+          <div class="flex flex-wrap gap-3">
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3ReqDriver" type="checkbox" class="rounded text-emerald-600" /><span>ขอพนักงานขับรถส่วนกลาง</span></label>
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3SelfDriver" type="checkbox" class="rounded text-emerald-600" /><span>ไม่ขอ (มีพขร.สำรอง)</span></label>
+          </div>
+          <input data-field="p3BackupDriver" placeholder="ชื่อพนักงานขับรถสำรอง (ถ้ามี)" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1 text-xs" />
+        </div>
+
+        <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 space-y-2 text-xs">
+          <div class="font-medium text-slate-700">สำหรับหน่วยยานพาหนะ (ผู้ตรวจสอบ)</div>
+          <input data-field="p3UnitPlate" placeholder="หมายเลขทะเบียนรถ" type="text" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+          <input data-field="p3UnitDriver" placeholder="พนักงานขับรถยนต์" type="text" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+          <div class="flex flex-wrap gap-3">
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3GasBenzine" type="checkbox" class="rounded text-emerald-600" /><span>เบนซิน</span></label>
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3Gas95" type="checkbox" class="rounded text-emerald-600" /><span>แกสโซฮอลล์ 95</span></label>
+            <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3GasDiesel" type="checkbox" class="rounded text-emerald-600" /><span>ดีเซล</span></label>
+          </div>
+          <div class="grid grid-cols-3 gap-2">
+            <input data-field="p3BookNo" placeholder="เล่มที่" type="text" class="rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+            <input data-field="p3SlipNo" placeholder="เลขที่" type="text" class="rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+            <input data-field="p3FuelBaht" placeholder="จำนวน (บาท)" type="text" class="rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+          </div>
+          <input data-field="p3UnitReviewer" placeholder="ชื่อผู้ตรวจสอบหน่วยยานพาหนะ" type="text" class="w-full rounded border border-slate-300 px-2 py-1 text-xs bg-white" />
+        </div>
+      </div>
+
+    </section>
+
+    <!-- RIGHT PANEL: Live A4 Exact Preview -->
+    <section id="previewPanel" class="print-area flex-1 preview-viewport lg:max-h-[calc(100vh-84px)] lg:overflow-y-auto py-1">
+
+      <!-- ======================== PAGE 1: แบบที่ 1 ขออนุมัติเดินทางไปราชการ ======================== -->
+      <article id="sheetForm1" class="a4-sheet">
+        <!-- Header: Garuda + บันทึกข้อความ -->
+        <div class="flex items-end mb-2.5 overlay-ghost" style="min-height: 15mm;">
+          <div style="width: 22mm;">
+            <img src="data:image/png;base64,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" alt="ตราครุฑ" class="doc-garuda" />
+          </div>
+          <div class="flex-1 doc-title" style="padding-right: 22mm; padding-bottom: 1.5mm;">บันทึกข้อความ</div>
+        </div>
+
+        <!-- ส่วนราชการ -->
+        <div class="doc-row overlay-ghost">
+          <span class="doc-label-bold">ส่วนราชการ</span>
+          <span id="v_agency" class="dotted-flex-left"></span>
+        </div>
+
+        <!-- ที่ / วันที่ -->
+        <div class="doc-row overlay-ghost">
+          <div class="flex items-baseline gap-1.5" style="width: 46%;">
+            <span class="doc-label-bold">ที่</span>
+            <span id="v_docNo" class="dotted-flex-left"></span>
+          </div>
+          <div class="flex items-baseline gap-1.5" style="width: 54%;">
+            <span class="doc-label-bold">วันที่</span>
+            <span id="v_docDate" class="dotted-flex-left"></span>
+          </div>
+        </div>
+
+        <!-- เรื่อง -->
+        <div class="doc-row overlay-ghost">
+          <span class="doc-label-bold">เรื่อง</span>
+          <span id="v_subject1" class="dotted-flex-left"></span>
+        </div>
+
+        <!-- เรียน -->
+        <div class="doc-row mb-2">
+          <span>เรียน</span>
+          <span id="v_recipient" class="ml-1.5"></span>
+        </div>
+
+        <!-- ย่อหน้า 1: ด้วยข้าพเจ้า -->
+        <div class="doc-row" style="padding-left: 14mm;">
+          <span>ด้วยข้าพเจ้า</span>
+          <span id="v_requesterName" class="dotted-flex"></span>
+          <span>ตำแหน่ง</span>
+          <span id="v_requesterPos" class="dotted-flex"></span>
+        </div>
+        <div class="doc-row mb-2">
+          <span>กลุ่มงาน</span>
+          <span id="v_department" class="dotted-flex"></span>
+          <span id="v_teamSummaryWrap" class="inline-flex items-baseline gap-1 whitespace-nowrap">
+            <span>พร้อมคณะ รวม</span>
+            <span id="v_teamCount" class="dotted-fill" style="width: 12mm;"></span>
+            <span>คน</span>
+            <span id="v_teamIntroText">โดยมีรายชื่อดังต่อไปนี้</span>
+          </span>
+        </div>
+
+        <!-- รายชื่อคณะเดินทาง (แสดงเฉพาะคนที่มีชื่อ) -->
+        <div id="v_teamListBlock" class="grid grid-cols-2 gap-x-5 gap-y-0.5 mb-2.5" style="padding-left: 10mm; padding-right: 2mm;"></div>
+
+        <!-- มีความประสงค์ -->
+        <div class="flex flex-wrap items-center gap-x-4 mb-1 overlay-ghost">
+          <span>มีความประสงค์</span>
+          <span class="inline-flex items-center"><span id="c_purposeTravel" class="doc-checkbox"></span>ขออนุมัติเดินทางไปราชการ</span>
+          <span class="inline-flex items-center"><span id="c_purposeGovCar" class="doc-checkbox"></span>และขออนุมัติใช้รถราชการ</span>
+        </div>
+        <div class="doc-row overlay-ghost">
+          <span>เข้าร่วมประชุม/อบรม/สัมมนา/ศึกษาดูงาน เรื่อง</span>
+          <span id="v_eventTitle1" class="dotted-flex-fixed"></span>
+        </div>
+        <div class="doc-row overlay-ghost">
+          <span id="v_eventTitle2" class="dotted-flex-fixed"></span>
+        </div>
+
+        <!-- ระหว่างวันที่ / ณ -->
+        <div class="doc-row overlay-ghost">
+          <span>ระหว่างวันที่</span>
+          <span id="v_eventDates" class="dotted-fill" style="width: 44mm;"></span>
+          <span>ณ</span>
+          <span id="v_eventPlace" class="dotted-flex-left"></span>
+        </div>
+
+        <!-- อำเภอ / จังหวัด / จัดโดย -->
+        <div class="doc-row overlay-ghost">
+          <span>อำเภอ</span>
+          <span id="v_eventDistrict" class="dotted-fill" style="width: 30mm;"></span>
+          <span>จังหวัด</span>
+          <span id="v_eventProvince" class="dotted-fill" style="width: 30mm;"></span>
+          <span>จัดโดย</span>
+          <span id="v_organizer" class="dotted-flex"></span>
+        </div>
+
+        <!-- ตามหนังสือที่ / ลงวันที่ / ออกเดินทาง -->
+        <div class="doc-row overlay-ghost">
+          <span>ตามหนังสือที่</span>
+          <span id="v_refDocNo" class="dotted-fill" style="width: 38mm;"></span>
+          <span>ลงวันที่</span>
+          <span id="v_refDocDate" class="dotted-fill" style="width: 36mm;"></span>
+          <span>ออกเดินทางวันที่</span>
+          <span id="v_departDate" class="dotted-flex"></span>
+        </div>
+
+        <!-- เวลา / โดยรถยนต์ราชการ -->
+        <div class="doc-row overlay-ghost">
+          <span>เวลา</span>
+          <span id="v_departTime" class="dotted-fill" style="width: 22mm;"></span>
+          <span class="inline-flex items-center ml-1"><span id="c_vehGovCar" class="doc-checkbox"></span>โดยรถยนต์ราชการ ทะเบียน</span>
+          <span id="v_govCarPlate" class="dotted-fill" style="width: 26mm;"></span>
+          <span>พขร.</span>
+          <span id="v_govDriver" class="dotted-flex"></span>
+        </div>
+
+        <!-- พาหนะอื่น ๆ -->
+        <div class="doc-row overlay-ghost">
+          <span class="inline-flex items-center"><span id="c_vehBus" class="doc-checkbox"></span>รถยนต์โดยสารปรับอากาศประจำทาง</span>
+          <span class="inline-flex items-center ml-2"><span id="c_vehMoto" class="doc-checkbox"></span>รถจักรยานยนต์</span>
+          <span class="inline-flex items-center ml-2"><span id="c_vehPrivate" class="doc-checkbox"></span>รถยนต์ส่วนบุคคล ทะเบียน</span>
+          <span id="v_privateCarPlate" class="dotted-flex"></span>
+        </div>
+
+        <!-- อื่นๆ / เดินทางกลับ -->
+        <div class="doc-row overlay-ghost">
+          <span class="inline-flex items-center"><span id="c_vehOther" class="doc-checkbox"></span>อื่นๆ ระบุ</span>
+          <span id="v_vehOtherText" class="dotted-fill" style="width: 32mm;"></span>
+          <span class="ml-1">และเดินทางกลับวันที่</span>
+          <span id="v_returnDate" class="dotted-flex"></span>
+          <span>เวลา</span>
+          <span id="v_returnTime" class="dotted-fill" style="width: 24mm;"></span>
+        </div>
+
+        <!-- ค่าใช้จ่าย -->
+        <div class="mt-1 mb-0.5 overlay-ghost">
+          <span>โดยหลังจากเสร็จสิ้นการเดินทางไปราชการ ขออนุมัติเบิกค่าใช้จ่ายในการเดินทางราชการครั้งนี้จาก</span>
+        </div>
+        <div class="mb-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 overlay-ghost">
+          <span class="inline-flex items-center"><span id="c_expCentral" class="doc-checkbox"></span>งบกลาง</span>
+          <span class="inline-flex items-center"><span id="c_expPho" class="doc-checkbox"></span>สสจ.ตาก</span>
+          <span class="inline-flex items-center"><span id="c_expOrganizer" class="doc-checkbox"></span>งบผู้จัด</span>
+          <span class="inline-flex items-center"><span id="c_expProject" class="doc-checkbox"></span>งบโครงการของฝ่าย</span>
+          <span class="inline-flex items-center"><span id="c_expNone" class="doc-checkbox"></span>ไม่ขอเบิก</span>
+          <span class="inline-flex items-center"><span id="c_expMaintenance" class="doc-checkbox"></span>เงินบำรุง</span>
+          <span class="inline-flex items-center"><span id="c_expOther" class="doc-checkbox"></span>อื่นๆ<span id="v_expOtherText" class="dotted-fill-left ml-1" style="width: 22mm;"></span></span>
+        </div>
+
+        <!-- จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ -->
+        <div class="mb-3 overlay-ghost" style="text-indent: 14mm;">
+          จึงเรียนมาเพื่อโปรดพิจารณาอนุมัติ
+        </div>
+
+        <!-- กลุ่มลายเซ็น 3 ราย (จัดชิดขวาอย่างเป็นระเบียบ) -->
+        <div class="space-y-2.5 text-center ml-auto overlay-ghost" style="width: 96mm;">
+          <div>
+            <div>(ลงชื่อ)<span class="dotted-fill" style="width: 52mm;"></span>ผู้ขออนุญาต</div>
+            <div>(<span id="v_sigRequester" class="dotted-fill" style="width: 52mm;"></span>)</div>
+            <div id="v_sigRequesterPos" style="min-height: 22px;"></div>
+          </div>
+
+          <div>
+            <div>(ลงชื่อ)<span class="dotted-fill" style="width: 52mm;"></span>ผู้ตรวจสอบ</div>
+            <div>(<span id="v_sigReviewer" class="dotted-fill" style="width: 52mm;"></span>)</div>
+            <div id="v_sigReviewerPos" style="min-height: 22px;"></div>
+          </div>
+
+          <div>
+            <div>(ลงชื่อ)<span class="dotted-fill" style="width: 52mm;"></span>หัวหน้างาน/ฝ่าย</div>
+            <div>(<span id="v_sigHead" class="dotted-fill" style="width: 52mm;"></span>)</div>
+            <div id="v_sigHeadPos" style="min-height: 22px;"></div>
+          </div>
+        </div>
+
+        <!-- อนุมัติ -->
+        <div id="v_approverBlock" class="mt-3 text-center overlay-ghost">
+          <div class="doc-label-bold mb-2">อนุมัติ</div>
+          <div class="mx-auto" style="width: 84mm;">
+            <div>(ลงชื่อ)<span class="dotted-fill" style="width: 56mm;"></span></div>
+            <div>(<span id="v_sigApprover" class="dotted-fill" style="width: 56mm;"></span>)</div>
+            <div id="v_sigApproverPos" style="min-height: 22px;"></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ======================== PAGE 2: แบบที่ 2 ขออนุญาตใช้รถยนต์ส่วนตัว ======================== -->
+      <article id="sheetForm2" class="a4-sheet page-2">
+        <!-- Header -->
+        <div class="flex items-end mb-2.5" style="min-height: 15mm;">
+          <div style="width: 22mm;">
+            <img src="data:image/png;base64,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" alt="ตราครุฑ" class="doc-garuda" />
+          </div>
+          <div class="flex-1 doc-title" style="padding-right: 22mm; padding-bottom: 1.5mm;">บันทึกข้อความ</div>
+        </div>
+
+        <!-- ส่วนราชการ -->
+        <div class="doc-row overlay-ghost">
+          <span class="doc-label-bold">ส่วนราชการ</span>
+          <span id="v2_agency" class="dotted-flex-left"></span>
+        </div>
+
+        <!-- ที่ / วันที่ -->
+        <div class="doc-row overlay-ghost">
+          <div class="flex items-baseline gap-1.5" style="width: 46%;">
+            <span class="doc-label-bold">ที่</span>
+            <span id="v2_docNo" class="dotted-flex-left"></span>
+          </div>
+          <div class="flex items-baseline gap-1.5" style="width: 54%;">
+            <span class="doc-label-bold">วันที่</span>
+            <span id="v2_docDate" class="dotted-flex-left"></span>
+          </div>
+        </div>
+
+        <!-- เรื่อง -->
+        <div class="doc-row overlay-ghost">
+          <span class="doc-label-bold">เรื่อง</span>
+          <span class="dotted-flex-left">ขออนุญาตใช้รถยนต์ส่วนตัวเดินทางไปราชการ</span>
+        </div>
+
+        <!-- เรียน -->
+        <div class="doc-row mb-3">
+          <span>เรียน</span>
+          <span id="v2_recipient" class="ml-1.5"></span>
+        </div>
+
+        <!-- เนื้อหา -->
+        <div class="doc-row" style="padding-left: 14mm;">
+          <span>ด้วยข้าพเจ้า</span>
+          <span id="v2_requesterName" class="dotted-flex"></span>
+          <span>ตำแหน่ง</span>
+          <span id="v2_requesterPos" class="dotted-flex"></span>
+        </div>
+
+        <div class="mb-2" style="line-height: 1.65;">
+          <span>ได้รับคำสั่ง/บันทึก</span><span id="v2_orderNo" class="dotted-fill" style="width: 56mm;"></span><span>ลงวันที่</span><span id="v2_orderDate" class="dotted-fill" style="width: 46mm;"></span>
+          <span>ให้ข้าพเจ้าเดินทางไปราชการ</span>
+          <span id="v2_eventTitle" style="border-bottom: 1px dotted #111827; padding: 0 5px;"></span>
+          <span> ที่</span><span id="v2_place" class="dotted-fill" style="width: 96mm;"></span>
+          <span>ระหว่างวันที่</span><span id="v2_startDate" class="dotted-fill" style="width: 42mm;"></span><span>ถึงวันที่</span><span id="v2_endDate" class="dotted-fill" style="width: 42mm;"></span>
+        </div>
+
+        <div class="doc-row mb-2">
+          <span>ในการเดินทางไปราชการในครั้งนี้เหตุผลใช้รถยนต์ส่วนตัวเพื่อ</span>
+          <span id="v2_reason" class="dotted-flex-left"></span>
+        </div>
+
+        <div class="mb-3" style="text-indent: 14mm; line-height: 1.65;">
+          <span>ข้าพเจ้ามีความจำเป็นต้องใช้รถยนต์ส่วนตัว ยี่ห้อ</span><span id="v2_carBrand" class="dotted-fill" style="width: 34mm;"></span>
+          <span>หมายเลขทะเบียน</span><span id="v2_carPlate" class="dotted-fill" style="width: 36mm;"></span>
+          <span>ใช้เป็นพาหนะในการเดินทาง ระยะทางจาก</span><span id="v2_origin" class="dotted-fill" style="width: 72mm;"></span>
+          <span>ถึง</span><span id="v2_dest" class="dotted-fill" style="width: 80mm;"></span>
+          <span>ระยะทางประมาณ</span><span id="v2_oneWayKm" class="dotted-fill" style="width: 24mm;"></span><span>กิโลเมตร</span>
+          <span>รวมระยะทางไป-กลับประมาณ</span><span id="v2_roundTripKm" class="dotted-fill" style="width: 26mm;"></span><span>กิโลเมตร</span>
+          <span>ข้าพเจ้าขอใช้สิทธิ์ในการขอเบิกเงินค่าชดเชยน้ำมันเชื้อเพลิงตามระเบียบฯ กิโลเมตรละ 4 บาท รวมเป็นเงิน</span><span id="v2_fuelAmount" class="dotted-fill" style="width: 24mm;"></span><span>บาท (<span id="v2_fuelAmountText" class="dotted-fill" style="width: 48mm;"></span>)</span>
+          <span>โดยข้าพเจ้าจะส่งหลักฐานขอเบิกเมื่อกลับจากไปราชการกลับมาแล้ว ทั้งนี้ถ้าหากเกิดอุบัติเหตุจากการที่นำรถยนต์ส่วนตัวไปราชการครั้งนี้ ทางราชการไม่ต้องรับผิดชอบใด ๆ ทั้งสิ้น</span>
+        </div>
+
+        <!-- จึงเรียนมาเพื่อโปรดพิจารณา -->
+        <div class="mb-6" style="padding-left: 14mm;">
+          <div>จึงเรียนมาเพื่อโปรดพิจารณา</div>
+          <div class="pl-4">1. อนุมัติให้ใช้รถยนต์ส่วนตัวเดินทางไปราชการและอนุมัติให้เดินทางไปราชการครั้งนี้</div>
+          <div class="pl-4">2. อนุมัติให้ใช้สิทธิเบิกค่าชดเชยน้ำมันเชื้อเพลิงได้ตามระเบียบฯ</div>
+        </div>
+
+        <!-- ความเห็นหัวหน้ากลุ่มงาน + ลงชื่อผู้ขออนุญาต -->
+        <div class="grid grid-cols-2 gap-6 items-start mb-8">
+          <div>
+            <div class="doc-label-bold mb-4">ความเห็นของหัวหน้ากลุ่มงาน</div>
+            <div class="border-b border-dotted border-slate-900 h-6 mb-2" style="width: 68mm;"></div>
+            <div>ตำแหน่ง<span class="dotted-fill" style="width: 54mm;"></span></div>
+          </div>
+          <div class="text-center">
+            <div class="mb-1">(ลงชื่อ)<span class="dotted-fill" style="width: 46mm;"></span>ผู้ขออนุญาต</div>
+            <div class="mb-1">(<span id="v2_sigRequester" class="dotted-fill" style="width: 46mm;"></span>)</div>
+            <div>ตำแหน่ง<span id="v2_sigRequesterPos" class="dotted-fill" style="width: 48mm;"></span></div>
+          </div>
+        </div>
+
+        <!-- ความเห็นของผู้มีอำนาจสั่งการ -->
+        <div class="grid grid-cols-2 gap-6">
+          <div></div>
+          <div>
+            <div class="doc-label-bold text-center mb-1">ความเห็นของผู้มีอำนาจสั่งการ</div>
+            <div class="text-center doc-label-bold mb-6 inline-flex items-center justify-center w-full"><span class="doc-checkbox"></span>อนุญาต</div>
+            <div class="border-b border-dotted border-slate-900 h-6 mb-2 mx-auto" style="width: 64mm;"></div>
+            <div class="border-b border-dotted border-slate-900 h-6 mx-auto" style="width: 64mm;"></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ======================== PAGE 3: แบบที่ 3 ใบขออนุญาตใช้รถยนต์ราชการ ======================== -->
+      <article id="sheetForm3" class="a4-sheet hidden hidden-sheet">
+        <div class="text-center font-bold mb-1.5" style="font-size: 18px !important;">
+          ใบอนุญาตใช้รถส่วนกลาง/ รถรับรอง /รถรับรองประจำจังหวัด
+        </div>
+
+        <div class="flex justify-center items-center gap-5 mb-2.5">
+          <span>(<span id="v3_inProv" class="inline-block w-4 text-center"></span>) ในจังหวัด</span>
+          <span>(<span id="v3_outProv" class="inline-block w-4 text-center"></span>) นอกจังหวัด</span>
+          <span>(<span id="v3_normal" class="inline-block w-4 text-center"></span>) แผนปกติ</span>
+          <span>(<span id="v3_urgent" class="inline-block w-4 text-center"></span>) แผนด่วน</span>
+        </div>
+
+        <div class="text-right mb-2">
+          <span>วันที่</span><span id="v3_day" class="dotted-fill" style="width: 14mm;"></span>
+          <span>เดือน</span><span id="v3_month" class="dotted-fill" style="width: 34mm;"></span>
+          <span>พ.ศ.</span><span id="v3_year" class="dotted-fill" style="width: 18mm;"></span>
+        </div>
+
+        <div class="doc-row mb-1.5">
+          <span>เรียน</span>
+          <span id="v3_recipient" class="dotted-fill-left" style="width: 68mm;"></span>
+        </div>
+
+        <div class="doc-row" style="padding-left: 14mm;">
+          <span>ข้าพเจ้า</span>
+          <span id="v3_requesterName" class="dotted-flex"></span>
+          <span>ตำแหน่ง</span>
+          <span id="v3_requesterPos" class="dotted-flex"></span>
+        </div>
+
+        <div class="doc-row">
+          <span>ขออนุญาตใช้รถยนต์(ไปไหน)</span>
+          <span id="v3_dest" class="dotted-flex-fixed"></span>
+        </div>
+
+        <div class="doc-row">
+          <span>เพื่อ</span>
+          <span id="v3_purpose1" class="dotted-flex-fixed"></span>
+        </div>
+        <div class="doc-row">
+          <span id="v3_purpose2" class="dotted-flex-fixed"></span>
+          <span>จำนวนนั่ง</span>
+          <span id="v3_seats" class="dotted-fill" style="width: 14mm;"></span>
+          <span>คน</span>
+        </div>
+
+        <div class="doc-row">
+          <span>ในวันที่</span>
+          <span id="v3_startDate" class="dotted-flex"></span>
+          <span>เวลา</span>
+          <span id="v3_startTime" class="dotted-fill" style="width: 18mm;"></span>
+          <span>น</span>
+          <span>ถึงวันที่</span>
+          <span id="v3_endDate" class="dotted-flex"></span>
+          <span>เวลา</span>
+          <span id="v3_endTime" class="dotted-fill" style="width: 18mm;"></span>
+          <span>น</span>
+        </div>
+
+        <div class="doc-row">
+          <span>ประเภทการเบิกจ่ายน้ำมัน</span>
+          <span>(<span id="v3_fuelCentral" class="inline-block w-3 text-center"></span>) งบกลาง</span>
+          <span>(<span id="v3_fuelProject" class="inline-block w-3 text-center"></span>) งบโครงการ</span>
+          <span>(<span id="v3_fuelOrg" class="inline-block w-3 text-center"></span>) งบผู้จัด</span>
+          <span>(<span id="v3_fuelOther" class="inline-block w-3 text-center"></span>) อื่น ๆ</span>
+          <span id="v3_fuelOtherText" class="dotted-flex-fixed"></span>
+        </div>
+
+        <div class="doc-row">
+          <span>โดย (<span id="v3_reqDriver" class="inline-block w-3 text-center"></span>) ขอพนักงานขับรถส่วนกลาง</span>
+          <span>(<span id="v3_selfDriver" class="inline-block w-3 text-center"></span>) ไม่ขอและมีพนักงานขับรถสำรองเป็นผู้ขับได้แก่</span>
+          <span id="v3_backupDriver" class="dotted-flex-fixed"></span>
+        </div>
+
+        <div class="mb-1">รายชื่อผู้โดยสารดังนี้</div>
+        <div id="v3_passengersList" class="grid grid-cols-2 gap-x-5 gap-y-0.5 mb-2.5" style="padding-left: 2mm;"></div>
+
+        <!-- ลายเซ็น 3 ส่วน (จัดแนวคอลัมน์ตรงกันทุกบรรทัด) -->
+        <div class="space-y-2.5 ml-auto mb-2.5" style="width: 96mm;">
+          <div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;">(ลงชื่อ)</span><span class="dotted-fill" style="width: 48mm;"></span><span class="ml-1.5 whitespace-nowrap">ผู้ขออนุญาต</span></div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;"></span><span>(</span><span id="v3_sigRequester" class="dotted-fill" style="width: 45mm;"></span><span>)</span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;">(ลงชื่อ)</span><span class="dotted-fill" style="width: 48mm;"></span><span class="ml-1.5 whitespace-nowrap">หัวหน้ากลุ่มงาน/งาน</span></div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;"></span><span>(</span><span id="v3_sigHead" class="dotted-fill" style="width: 45mm;"></span><span>)</span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;">(ลงชื่อ)</span><span class="dotted-fill" style="width: 48mm;"></span><span class="ml-1.5 whitespace-nowrap">ผู้ตรวจสอบ</span></div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;"></span><span>(</span><span id="v3_sigReviewer" class="dotted-fill" style="width: 45mm;"></span><span>)</span></div>
+            <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;"></span><span class="dotted-fill" style="width: 48mm;"></span><span class="ml-1.5 whitespace-nowrap">(วัน เดือน ปี)</span></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 items-start mb-2">
+          <div class="text-left pl-4">(ลงนามผู้มีอำนาจสั่งใช้รถ)</div>
+          <div class="text-center">
+            <div class="mb-2">อนุมัติ</div>
+            <div>(ลงชื่อ)<span class="dotted-fill" style="width: 50mm;"></span></div>
+            <div>(<span id="v3_sigApprover" class="dotted-fill" style="width: 50mm;"></span>)</div>
+          </div>
+        </div>
+
+        <!-- สำหรับหน่วยยานพาหนะ -->
+        <div class="pt-1">
+          <div class="pl-8 pb-0.5 mb-1.5 border-b border-slate-500">สำหรับ หน่วยยานพาหนะ (ผู้ตรวจสอบ)</div>
+          <div class="doc-row" style="padding-left: 10mm;">
+            <span>เห็นควรอนุญาตให้ใช้รถยนต์ราชการ หมายเลขทะเบียน</span>
+            <span id="v3_unitPlate" class="dotted-flex-left"></span>
+          </div>
+          <div class="doc-row">
+            <span>โดยมีพนักงานขับรถยนต์</span>
+            <span id="v3_unitDriver" class="dotted-flex-fixed"></span>
+            <span>และขอสั่งจ่ายน้ำมันจากงบกลาง</span>
+          </div>
+          <div class="doc-row">
+            <span>ชนิด</span>
+            <span>(<span id="v3_gasBenzine" class="inline-block w-3 text-center"></span>) เบนซิน</span>
+            <span>(<span id="v3_gas95" class="inline-block w-3 text-center"></span>) แกสโซฮอลล์ 95</span>
+            <span>(<span id="v3_gasDiesel" class="inline-block w-3 text-center"></span>) ดีเซล</span>
+            <span>ตามใบเบิกน้ำมัน เล่มที่</span>
+            <span id="v3_bookNo" class="dotted-fill" style="width: 16mm;"></span>
+            <span>เลขที่</span>
+            <span id="v3_slipNo" class="dotted-fill" style="width: 16mm;"></span>
+            <span>จำนวน</span>
+            <span id="v3_fuelBaht" class="dotted-fill" style="width: 18mm;"></span>
+            <span>บาท</span>
+          </div>
+          <div class="text-center ml-auto mt-1.5" style="width: 86mm;">
+            <div>ลงชื่อ<span class="dotted-fill" style="width: 52mm;"></span>ผู้ตรวจสอบ</div>
+            <div>(<span id="v3_unitReviewer" class="dotted-fill" style="width: 52mm;"></span>)</div>
+          </div>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <script>
+    const SHEET_ID = '1FnZ5jnK0dmdlckEY_QFXj29EKlM88ibueZk7_OWQRGQ';
+    const STORAGE_KEY = 'tsy_official_travel_form_v2';
+    const HISTORY_KEY = 'tsy_official_travel_history_v1';
+    const AGENCIES_KEY = 'tsy_official_travel_agencies_v1';
+    const GAS_API_KEY = 'tsy_official_travel_gas_url_v1';
+    const DEFAULT_GAS_API_URL = ''; // วางลิงก์ https://script.google.com/macros/s/.../exec ตรงนี้ได้หากต้องการฝังถาวรบน GitHub
+    const DEFAULT_AGENCIES = [
+      {
+        name: 'สำนักงานสาธารณสุขอำเภอท่าสองยาง อำเภอท่าสองยาง จังหวัดตาก โทร. 0 5558 9116',
+        docNo: 'ตก 0533/'
+      }
+    ];
+
+    const SAMPLE_DATA = {
+      sheetMode: 'form1',
+      agency: 'สำนักงานสาธารณสุขอำเภอท่าสองยาง อำเภอท่าสองยาง จังหวัดตาก โทร. 0 5558 9116',
+      docNo: 'ตก 0533/346',
+      docDate: '5 พฤศจิกายน 2569',
+      subject1: 'ขออนุมัติเดินทางไปราชการ และขออนุมัติใช้รถยนต์ส่วนบุคคล',
+      recipient: 'นายอำเภอท่าสองยาง',
+      requesterName: 'นายอลงกต ไพรวิไลวรรณ',
+      requesterPos: 'นักวิชาการสาธารณสุขปฏิบัติการ',
+      department: 'ส่งเสริมสุขภาพและป้องกันโรค',
+      teamCount: '11',
+      team: [
+        'นายจิรศักดิ์ มรกตคีรีรัตน์',
+        'นางสาวอรณัชชา องค์การ',
+        'นางอรุณี มูลดี',
+        'นางสาวอภิรดี วงษ์เพ็ญ',
+        '-', '-', '-', '-', '-', '-'
+      ],
+      checks: {
+        purposeTravel: true,
+        purposeGovCar: false,
+        vehGovCar: false,
+        vehBus: false,
+        vehMoto: false,
+        vehPrivate: true,
+        vehOther: true,
+        expCentral: false,
+        expPho: false,
+        expOrganizer: false,
+        expProject: false,
+        expNone: false,
+        expMaintenance: false,
+        expOther: false,
+        showApprover: true,
+        p3InProv: true,
+        p3OutProv: false,
+        p3Normal: true,
+        p3Urgent: false,
+        p3FuelCentral: true,
+        p3FuelProject: false,
+        p3FuelOrg: false,
+        p3FuelOther: false,
+        p3ReqDriver: true,
+        p3SelfDriver: false,
+        p3GasBenzine: false,
+        p3Gas95: false,
+        p3GasDiesel: false
+      },
+      overlayMode: false,
+      teamPrintMask: [false, false, false, false, false, false, false, false, false, false],
+      eventTitle: 'เข้าร่วมประชุมเชิงปฏิบัติการขับเคลื่อนการดำเนินงานการคัดกรอง บำบัดรักษาฟื้นฟูสภาพและติดตามผู้มีปัญหาดื่มเครื่องดื่มแอลกอฮอล์',
+      eventDates: '9-11 พฤศจิกายน 2569',
+      eventPlace: 'โรงแรมทีเค พาเลช แอนด์ คอนเวนชั่น กรุงเทพมหานคร',
+      eventDistrict: '-',
+      eventProvince: 'กทม.',
+      organizer: 'กรมควบคุมโรค',
+      refDocNo: 'ตก 0033.005/ว123',
+      refDocDate: '21 ตุลาคม 2569',
+      departDate: '8 พฤศจิกายน 2569',
+      departTime: '16.00 น.',
+      returnDate: '12 พฤศจิกายน 2569',
+      returnTime: '16.00 น.',
+      govCarPlate: '',
+      govDriver: '',
+      privateCarPlate: 'กฉ 7768 ตาก',
+      vehOtherText: 'เครื่องบิน',
+      expOtherText: '',
+      reviewerName: 'นางมยุรี คีรีพิทักษ์',
+      reviewerPos: 'เจ้าพนักงานสาธารณสุขชำนาญงาน',
+      headName: 'นายพีรยุทธ บุญปาล',
+      headPos: 'สาธารณสุขอำเภอท่าสองยาง',
+      approverName: 'นายอัครพันธุ์ พูลศิริ',
+      approverPos: 'นายอำเภอท่าสองยาง',
+      p2Date: '20 สิงหาคม 2569',
+      carBrand: 'MAZDA',
+      p2OrderNo: 'ตก 0033.010/ว14605',
+      p2OrderDate: '11 สิงหาคม 2569',
+      p2EventTitle: 'เข้าร่วมนำเสนอผลงานวิชาการเข้าร่วมการประกวดในงานประชุมวิชาการกระทรวงสาธารณสุข ประจำปีงบประมาณ 2569',
+      p2Place: 'โรงแรมโฆษะ ขอนแก่น (Kosa Hotel & Wellness Center)',
+      p2StartDate: '2 กันยายน 2569',
+      p2EndDate: '4 กันยายน 2569',
+      p2Reason: 'เพื่อความสะดวกและคล่องตัวในการเดินทาง',
+      originPlace: 'สำนักงานสาธารณสุขอำเภอท่าสองยาง',
+      destPlace: 'โรงแรมโฆษะ ขอนแก่น (Kosa Hotel & Wellness Center)',
+      oneWayKm: '625',
+      roundTripKm: '1,250',
+      fuelAmount: '5,000',
+      fuelAmountText: 'ห้าพันบาทถ้วน',
+      p3Day: '5',
+      p3Month: 'พฤศจิกายน',
+      p3Year: '2569',
+      p3Dest: 'โรงแรมทีเค พาเลช แอนด์ คอนเวนชั่น กรุงเทพมหานคร',
+      p3Purpose: 'เข้าร่วมประชุมเชิงปฏิบัติการขับเคลื่อนการดำเนินงาน',
+      p3Seats: '11',
+      p3StartDate: '8 พฤศจิกายน 2569',
+      p3StartTime: '16.00',
+      p3EndDate: '12 พฤศจิกายน 2569',
+      p3EndTime: '16.00',
+      p3FuelOtherText: '',
+      p3BackupDriver: '',
+      p3UnitPlate: '',
+      p3UnitCode: '',
+      p3UnitDriver: '',
+      p3BookNo: '',
+      p3SlipNo: '',
+      p3FuelBaht: '',
+      p3UnitReviewer: ''
+    };
+
+    const EMPTY_DATA = {
+      sheetMode: 'form1',
+      agency: 'สำนักงานสาธารณสุขอำเภอท่าสองยาง อำเภอท่าสองยาง จังหวัดตาก โทร. 0 5558 9116',
+      docNo: 'ตก 0533/',
+      docDate: '',
+      subject1: 'ขออนุมัติเดินทางไปราชการ',
+      recipient: 'นายอำเภอท่าสองยาง',
+      requesterName: '',
+      requesterPos: '',
+      department: '',
+      teamCount: '',
+      team: ['', '', '', '', '', '', '', '', '', ''],
+      checks: {
+        purposeTravel: true,
+        purposeGovCar: false,
+        vehGovCar: false,
+        vehBus: false,
+        vehMoto: false,
+        vehPrivate: false,
+        vehOther: false,
+        expCentral: false,
+        expPho: false,
+        expOrganizer: false,
+        expProject: false,
+        expNone: false,
+        expMaintenance: false,
+        expOther: false,
+        showApprover: true,
+        p3InProv: true,
+        p3OutProv: false,
+        p3Normal: true,
+        p3Urgent: false,
+        p3FuelCentral: true,
+        p3FuelProject: false,
+        p3FuelOrg: false,
+        p3FuelOther: false,
+        p3ReqDriver: true,
+        p3SelfDriver: false,
+        p3GasBenzine: false,
+        p3Gas95: false,
+        p3GasDiesel: false
+      },
+      overlayMode: false,
+      teamPrintMask: [false, false, false, false, false, false, false, false, false, false],
+      eventTitle: '',
+      eventDates: '',
+      eventPlace: '',
+      eventDistrict: '',
+      eventProvince: '',
+      organizer: '',
+      refDocNo: '',
+      refDocDate: '',
+      departDate: '',
+      departTime: '',
+      returnDate: '',
+      returnTime: '',
+      govCarPlate: '',
+      govDriver: '',
+      privateCarPlate: '',
+      vehOtherText: '',
+      expOtherText: '',
+      reviewerName: '',
+      reviewerPos: '',
+      headName: '',
+      headPos: '',
+      approverName: '',
+      approverPos: '',
+      p2Date: '',
+      carBrand: '',
+      p2OrderNo: '',
+      p2OrderDate: '',
+      p2EventTitle: '',
+      p2Place: '',
+      p2StartDate: '',
+      p2EndDate: '',
+      p2Reason: '',
+      originPlace: 'สำนักงานสาธารณสุขอำเภอท่าสองยาง',
+      destPlace: '',
+      oneWayKm: '',
+      roundTripKm: '',
+      fuelAmount: '',
+      fuelAmountText: '',
+      p3Day: '',
+      p3Month: '',
+      p3Year: '',
+      p3Dest: '',
+      p3Purpose: '',
+      p3Seats: '',
+      p3StartDate: '',
+      p3StartTime: '',
+      p3EndDate: '',
+      p3EndTime: '',
+      p3FuelOtherText: '',
+      p3BackupDriver: '',
+      p3UnitPlate: '',
+      p3UnitCode: '',
+      p3UnitDriver: '',
+      p3BookNo: '',
+      p3SlipNo: '',
+      p3FuelBaht: '',
+      p3UnitReviewer: ''
+    };
+
+    let state = JSON.parse(JSON.stringify(SAMPLE_DATA));
+    let historyRecords = [];
+    let agencyList = JSON.parse(JSON.stringify(DEFAULT_AGENCIES));
+
+    const isGAS = typeof google !== 'undefined' && google.script && google.script.run;
+    function getGasApiUrl() {
+      try {
+        return localStorage.getItem(GAS_API_KEY) || DEFAULT_GAS_API_URL;
+      } catch (e) {
+        return DEFAULT_GAS_API_URL;
+      }
+    }
+    async function gasFetchGet(action) {
+      const url = getGasApiUrl();
+      if (!url) return null;
+      const sep = url.includes('?') ? '&' : '?';
+      const res = await fetch(url + sep + 'action=' + encodeURIComponent(action));
+      return await res.json();
+    }
+    async function gasFetchPost(payload) {
+      const url = getGasApiUrl();
+      if (!url) return null;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      return await res.json();
+    }
+
+    function numberToThaiText(num) {
+      const n = Number(num);
+      if (!Number.isFinite(n) || n <= 0) return '';
+      const digits = ['ศูนย์', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+      const units = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+
+      function convertInt(str) {
+        let res = '';
+        const len = str.length;
+        for (let i = 0; i < len; i++) {
+          const d = parseInt(str[i], 10);
+          const pos = len - i - 1;
+          if (d === 0) continue;
+          if (pos === 1 && d === 1) res += 'สิบ';
+          else if (pos === 1 && d === 2) res += 'ยี่สิบ';
+          else if (pos === 0 && d === 1 && len > 1) res += 'เอ็ด';
+          else res += digits[d] + units[pos % 6];
+          if (pos > 0 && pos % 6 === 0) res += 'ล้าน';
+        }
+        return res;
+      }
+
+      const fixed = n.toFixed(2);
+      const [intPart, decPart] = fixed.split('.');
+      let out = convertInt(intPart) + 'บาท';
+      out += decPart === '00' ? 'ถ้วน' : convertInt(decPart) + 'สตางค์';
+      return out;
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toastBox');
+      const txt = document.getElementById('toastMsg');
+      txt.textContent = msg;
+      box.classList.remove('hidden');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add('hidden');
+      }, 2500);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          state = Object.assign(JSON.parse(JSON.stringify(SAMPLE_DATA)), JSON.parse(raw));
+        }
+        const hRaw = localStorage.getItem(HISTORY_KEY);
+        if (hRaw) historyRecords = JSON.parse(hRaw) || [];
+        const aRaw = localStorage.getItem(AGENCIES_KEY);
+        if (aRaw) {
+          const parsedA = JSON.parse(aRaw);
+          if (Array.isArray(parsedA) && parsedA.length > 0) agencyList = parsedA;
+        }
+      } catch (e) {}
+    }
+
+    function updateHistoryCount() {
+      const el = document.getElementById('historyCount');
+      if (el) el.textContent = String(historyRecords.length);
+    }
+
+    function persistAgencies() {
+      try {
+        localStorage.setItem(AGENCIES_KEY, JSON.stringify(agencyList));
+      } catch (e) {}
+      if (isGAS) {
+        google.script.run.saveAgencySettings(agencyList);
+      } else if (getGasApiUrl()) {
+        gasFetchPost({ action: 'saveAgencies', list: agencyList }).catch(() => {});
+      }
+    }
+
+    function renderAgencyQuickSelect(filterText) {
+      const list = document.getElementById('agencyDropdownList');
+      if (!list) return;
+      const q = (filterText || '').trim().toLowerCase();
+      const matches = agencyList
+        .map((item, idx) => ({ item, idx }))
+        .filter(({ item }) => !q || item.name.toLowerCase().includes(q) || (item.docNo || '').toLowerCase().includes(q));
+
+      if (matches.length === 0) {
+        list.innerHTML = '<div class="px-2.5 py-2 text-[11px] text-slate-400 text-center">ไม่พบส่วนราชการที่ค้นหา</div>';
+        return;
+      }
+      list.innerHTML = '';
+      matches.forEach(({ item }) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'w-full text-left px-2.5 py-1.5 hover:bg-emerald-50 transition block';
+        btn.innerHTML = `<div class="text-[11px] font-medium text-slate-800 leading-snug">${item.name}</div><div class="text-[10px] text-emerald-700">${item.docNo || '-'}</div>`;
+        btn.addEventListener('click', () => {
+          state.agency = item.name;
+          if (item.docNo) state.docNo = item.docNo;
+          const inp = document.getElementById('agencySearchInput');
+          if (inp) inp.value = '';
+          list.classList.add('hidden');
+          syncInputsFromState();
+          renderPreview();
+          saveState();
+          showToast('เปลี่ยนส่วนราชการและเลขที่หนังสือแล้ว');
+        });
+        list.appendChild(btn);
+      });
+    }
+
+    function renderAgencySettingsList() {
+      const list = document.getElementById('agencySettingsList');
+      if (!list) return;
+      if (!agencyList.length) {
+        list.innerHTML = '<div class="text-center py-6 text-xs text-slate-400">ยังไม่มีรายการส่วนราชการ</div>';
+        return;
+      }
+      list.innerHTML = '';
+      agencyList.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'p-3 rounded-xl border border-slate-200 flex items-center justify-between gap-3 bg-slate-50/70';
+        row.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-medium text-slate-800">${item.name}</div>
+            <div class="text-[11px] text-emerald-700 mt-0.5">เลขที่: ${item.docNo || '-'}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" data-ag="use" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium">เลือกใช้</button>
+            <button type="button" data-ag="del" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs">ลบ</button>
+          </div>
+        `;
+        row.querySelector('[data-ag="use"]').addEventListener('click', () => {
+          state.agency = item.name;
+          if (item.docNo) state.docNo = item.docNo;
+          syncInputsFromState();
+          renderPreview();
+          saveState();
+          document.getElementById('settingsModal').classList.add('hidden');
+          showToast('เลือกส่วนราชการเรียบร้อย');
+        });
+        row.querySelector('[data-ag="del"]').addEventListener('click', () => {
+          agencyList.splice(idx, 1);
+          persistAgencies();
+          renderAgencyQuickSelect();
+          renderAgencySettingsList();
+          showToast('ลบส่วนราชการแล้ว');
+        });
+        list.appendChild(row);
+      });
+    }
+
+    function loadHistoryFromBackend() {
+      renderAgencyQuickSelect();
+      if (isGAS) {
+        google.script.run
+          .withSuccessHandler((rows) => {
+            historyRecords = Array.isArray(rows) ? rows : [];
+            updateHistoryCount();
+          })
+          .getTravelRecords();
+        google.script.run
+          .withSuccessHandler((list) => {
+            if (Array.isArray(list) && list.length > 0) {
+              agencyList = list;
+              renderAgencyQuickSelect();
+            }
+          })
+          .getAgencySettings();
+      } else if (getGasApiUrl()) {
+        updateHistoryCount();
+        gasFetchGet('init').then((res) => {
+          if (res && res.ok) {
+            if (Array.isArray(res.records)) {
+              historyRecords = res.records;
+              updateHistoryCount();
+            }
+            if (Array.isArray(res.agencies) && res.agencies.length > 0) {
+              agencyList = res.agencies;
+              renderAgencyQuickSelect();
+            }
+          }
+        }).catch(() => {});
+      } else {
+        updateHistoryCount();
+      }
+    }
+
+    function saveCurrentRecord() {
+      const record = {
+        id: 'REC-' + Date.now(),
+        savedAt: new Date().toLocaleString('th-TH'),
+        sheetId: SHEET_ID,
+        data: JSON.parse(JSON.stringify(state))
+      };
+
+      if (isGAS) {
+        showToast('กำลังบันทึกลง Google Sheet...');
+        google.script.run
+          .withSuccessHandler(() => {
+            historyRecords.unshift(record);
+            updateHistoryCount();
+            showToast('บันทึกลง Google Sheet เรียบร้อย');
+          })
+          .withFailureHandler((err) => {
+            showToast('เกิดข้อผิดพลาด: ' + err.message);
+          })
+          .saveTravelRecord(record);
+      } else if (getGasApiUrl()) {
+        showToast('กำลังบันทึกลง Google Sheet...');
+        gasFetchPost({ action: 'saveRecord', record })
+          .then((res) => {
+            if (res && res.ok) {
+              historyRecords.unshift(record);
+              try { localStorage.setItem(HISTORY_KEY, JSON.stringify(historyRecords)); } catch (e) {}
+              updateHistoryCount();
+              showToast('บันทึกลง Google Sheet เรียบร้อย');
+            } else {
+              showToast('บันทึกไม่สำเร็จ: ' + ((res && res.error) || 'ตรวจสอบลิงก์ GAS'));
+            }
+          })
+          .catch(() => {
+            historyRecords.unshift(record);
+            try { localStorage.setItem(HISTORY_KEY, JSON.stringify(historyRecords)); } catch (e) {}
+            updateHistoryCount();
+            showToast('บันทึกไว้ในเครื่องชั่วคราว (เชื่อมต่อ Sheet ไม่ได้)');
+          });
+      } else {
+        historyRecords.unshift(record);
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(historyRecords));
+        } catch (e) {}
+        updateHistoryCount();
+        showToast('บันทึกในเครื่องแล้ว (ใส่ลิงก์ /exec ในตั้งค่าเพื่อเชื่อม Sheet)');
+      }
+    }
+
+    function deleteHistoryRecord(rec, idx) {
+      if (isGAS) {
+        showToast('กำลังลบรายการจาก Google Sheet...');
+        google.script.run
+          .withSuccessHandler(() => {
+            historyRecords.splice(idx, 1);
+            updateHistoryCount();
+            renderHistoryList();
+            showToast('ลบรายการออกจาก Google Sheet แล้ว');
+          })
+          .withFailureHandler((err) => {
+            showToast('ลบไม่สำเร็จ: ' + err.message);
+          })
+          .deleteTravelRecord(rec.id);
+      } else if (getGasApiUrl()) {
+        showToast('กำลังลบรายการจาก Google Sheet...');
+        gasFetchPost({ action: 'deleteRecord', recordId: rec.id })
+          .then(() => {
+            historyRecords.splice(idx, 1);
+            try { localStorage.setItem(HISTORY_KEY, JSON.stringify(historyRecords)); } catch (e) {}
+            updateHistoryCount();
+            renderHistoryList();
+            showToast('ลบรายการออกจาก Google Sheet แล้ว');
+          })
+          .catch(() => showToast('ลบจาก Sheet ไม่สำเร็จ'));
+      } else {
+        historyRecords.splice(idx, 1);
+        try {
+          localStorage.setItem(HISTORY_KEY, JSON.stringify(historyRecords));
+        } catch (e) {}
+        updateHistoryCount();
+        renderHistoryList();
+        showToast('ลบรายการออกจากประวัติแล้ว');
+      }
+    }
+
+    function renderHistoryList() {
+      const list = document.getElementById('historyList');
+      if (!historyRecords.length) {
+        list.innerHTML = '<div class="text-center py-8 text-sm text-slate-400">ยังไม่มีประวัติการบันทึก กดปุ่ม "บันทึกลง Sheet" เพื่อเก็บรายการ</div>';
+        return;
+      }
+      list.innerHTML = '';
+      historyRecords.forEach((rec, idx) => {
+        const d = rec.data || {};
+        const card = document.createElement('div');
+        card.className = 'bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between gap-3';
+        card.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="font-medium text-sm text-slate-800 truncate">${d.subject1 || 'ขออนุญาตเดินทางไปราชการ'}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${d.docNo || '-'} • ${d.requesterName || '-'} • ${d.eventDates || d.p2StartDate || '-'}</div>
+            <div class="text-[11px] text-slate-400 mt-0.5">บันทึกเมื่อ: ${rec.savedAt || '-'}</div>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button type="button" data-action="load" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium">โหลดมาแก้ไข</button>
+            <button type="button" data-action="delete" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-medium">ลบ</button>
+          </div>
+        `;
+        card.querySelector('[data-action="load"]').addEventListener('click', () => {
+          state = Object.assign(JSON.parse(JSON.stringify(EMPTY_DATA)), JSON.parse(JSON.stringify(d)));
+          syncInputsFromState();
+          renderPreview();
+          if (window._applySheetMode) window._applySheetMode(state.sheetMode || 'form1');
+          saveState();
+          document.getElementById('historyModal').classList.add('hidden');
+          showToast('โหลดข้อมูลจากประวัติแล้ว');
+        });
+        card.querySelector('[data-action="delete"]').addEventListener('click', () => {
+          deleteHistoryRecord(rec, idx);
+        });
+        list.appendChild(card);
+      });
+    }
+
+    function renderSplitTwoLines(text, id1, id2, fallbackW) {
+      const el1 = document.getElementById(id1);
+      const el2 = document.getElementById(id2);
+      if (!el1 || !el2) return;
+      const clean = (text || '').replace(/\s+/g, ' ').trim();
+      if (!clean) {
+        el1.textContent = '';
+        el2.textContent = '';
+        return;
+      }
+      const measurer = document.createElement('span');
+      const cs = window.getComputedStyle(el1);
+      measurer.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:' + cs.font + ';letter-spacing:' + cs.letterSpacing + ';';
+      document.body.appendChild(measurer);
+      const maxW = el1.clientWidth > 60 ? (el1.clientWidth - 18) : fallbackW;
+      measurer.textContent = clean;
+      if (measurer.offsetWidth <= maxW) {
+        el1.textContent = clean;
+        el2.textContent = '';
+        document.body.removeChild(measurer);
+        return;
+      }
+      let tokens = [];
+      if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+        const seg = new Intl.Segmenter('th', { granularity: 'word' });
+        tokens = Array.from(seg.segment(clean), x => x.segment);
+      } else {
+        tokens = clean.split('');
+      }
+      let line1 = '';
+      let splitIdx = 0;
+      for (let i = 0; i < tokens.length; i++) {
+        const cand = line1 + tokens[i];
+        measurer.textContent = cand;
+        if (measurer.offsetWidth > maxW && line1.length > 0) break;
+        line1 = cand;
+        splitIdx = i + 1;
+      }
+      document.body.removeChild(measurer);
+      el1.textContent = line1.trim();
+      el2.textContent = tokens.slice(splitIdx).join('').trim();
+    }
+
+    function setText(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val || '';
+    }
+
+    function setCheck(id, checked) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = checked ? '✓' : '';
+    }
+
+    function renderTeamEditor() {
+      const container = document.getElementById('teamEditorList');
+      if (!container) return;
+      if (!Array.isArray(state.team)) state.team = [];
+      if (state.team.length === 0) {
+        container.className = '';
+        container.innerHTML = '<div class="text-xs text-slate-400 py-2 px-3 bg-slate-50 rounded-lg border border-dashed border-slate-200 text-center">เดินทางคนเดียว (กด "+ เพิ่มคน" หากมีผู้ร่วมเดินทาง)</div>';
+        return;
+      }
+      container.className = 'grid grid-cols-1 sm:grid-cols-2 gap-1.5';
+      container.innerHTML = '';
+      if (!Array.isArray(state.teamPrintMask)) state.teamPrintMask = [];
+      state.team.forEach((name, idx) => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-1';
+        if (state.overlayMode) {
+          const pChk = document.createElement('input');
+          pChk.type = 'checkbox';
+          pChk.checked = Boolean(state.teamPrintMask[idx]);
+          pChk.title = 'พิมพ์ชื่อนี้ลงกระดาษเดิม';
+          pChk.className = 'rounded text-amber-600 focus:ring-amber-500 shrink-0';
+          pChk.addEventListener('change', () => {
+            state.teamPrintMask[idx] = pChk.checked;
+            renderPreview();
+            saveState();
+          });
+          row.appendChild(pChk);
+        }
+        const num = document.createElement('span');
+        num.className = 'text-xs text-slate-500 w-5 text-right shrink-0';
+        num.textContent = (idx + 1) + '.';
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.value = name || '';
+        inp.placeholder = 'ชื่อ-สกุล ผู้ร่วมเดินทางคนที่ ' + (idx + 1);
+        inp.className = 'flex-1 min-w-0 rounded-lg border border-slate-300 px-2 py-1 text-xs focus:border-emerald-500 outline-none';
+        inp.addEventListener('input', () => {
+          state.team[idx] = inp.value;
+          if (state.overlayMode && inp.value.trim() && inp.value.trim() !== '-') {
+            state.teamPrintMask[idx] = true;
+          }
+          renderPreview();
+          saveState();
+        });
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'w-6 h-6 rounded-md text-rose-500 hover:bg-rose-50 flex items-center justify-center text-sm shrink-0';
+        delBtn.textContent = '×';
+        delBtn.title = 'ลบรายชื่อนี้';
+        delBtn.addEventListener('click', () => {
+          state.team.splice(idx, 1);
+          state.teamPrintMask.splice(idx, 1);
+          renderTeamEditor();
+          renderPreview();
+          saveState();
+        });
+        row.appendChild(num);
+        row.appendChild(inp);
+        row.appendChild(delBtn);
+        container.appendChild(row);
+      });
+    }
+
+    function syncInputsFromState() {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        const key = el.getAttribute('data-field');
+        el.value = state[key] ?? '';
+      });
+      renderTeamEditor();
+      document.querySelectorAll('[data-check]').forEach(el => {
+        const key = el.getAttribute('data-check');
+        el.checked = Boolean(state.checks && state.checks[key]);
+      });
+      const ovChk = document.getElementById('chkOverlayMode');
+      const ovHint = document.getElementById('overlayHint');
+      if (ovChk) ovChk.checked = Boolean(state.overlayMode);
+      if (ovHint) ovHint.classList.toggle('hidden', !state.overlayMode);
+    }
+
+    function renderPreview() {
+      setText('v_agency', state.agency);
+      setText('v_docNo', state.docNo);
+      setText('v_docDate', state.docDate);
+      setText('v_subject1', state.subject1);
+      setText('v_recipient', state.recipient);
+      setText('v_requesterName', state.requesterName);
+      setText('v_requesterPos', state.requesterPos);
+      setText('v_department', state.department);
+      setText('v_teamCount', state.teamCount);
+
+      const teamArr = Array.isArray(state.team) ? state.team : [];
+      const teamSummaryWrap = document.getElementById('v_teamSummaryWrap');
+      const teamIntroText = document.getElementById('v_teamIntroText');
+      const teamListBlock = document.getElementById('v_teamListBlock');
+
+      if (teamArr.length === 0) {
+        if (teamSummaryWrap) teamSummaryWrap.classList.add('hidden');
+        if (teamListBlock) {
+          teamListBlock.innerHTML = '';
+          teamListBlock.classList.add('hidden');
+        }
+      } else {
+        if (teamSummaryWrap) teamSummaryWrap.classList.remove('hidden');
+        if (teamIntroText) teamIntroText.classList.remove('hidden');
+        if (teamListBlock) {
+          teamListBlock.classList.remove('hidden');
+          teamListBlock.innerHTML = '';
+          const sheet1 = document.getElementById('sheetForm1');
+          if (sheet1) sheet1.classList.toggle('overlay-mode', Boolean(state.overlayMode));
+          teamArr.forEach((member, idx) => {
+            const item = document.createElement('div');
+            item.className = 'flex items-baseline gap-1';
+            const printThis = !state.overlayMode || Boolean(state.teamPrintMask && state.teamPrintMask[idx]);
+            const numClass = state.overlayMode ? 'overlay-num-ghost' : '';
+            const lineClass = state.overlayMode ? 'dotted-flex-left overlay-ghost-line' : 'dotted-flex-left';
+            const textClass = (!printThis && state.overlayMode) ? 'overlay-ghost' : '';
+            item.innerHTML = `<span class="${numClass}" style="width: 22px; text-align: right;">${idx + 1}.</span><span class="${lineClass}"><span class="${textClass}">${member || ''}</span></span>`;
+            teamListBlock.appendChild(item);
+          });
+        }
+      }
+
+      setCheck('c_purposeTravel', state.checks.purposeTravel);
+      setCheck('c_purposeGovCar', state.checks.purposeGovCar);
+      renderSplitTwoLines(state.eventTitle || '', 'v_eventTitle1', 'v_eventTitle2', 340);
+      setText('v_eventDates', state.eventDates);
+      setText('v_eventPlace', state.eventPlace);
+      setText('v_eventDistrict', state.eventDistrict);
+      setText('v_eventProvince', state.eventProvince);
+      setText('v_organizer', state.organizer);
+      setText('v_refDocNo', state.refDocNo);
+      setText('v_refDocDate', state.refDocDate);
+      setText('v_departDate', state.departDate);
+      setText('v_departTime', state.departTime);
+
+      setCheck('c_vehGovCar', state.checks.vehGovCar);
+      setText('v_govCarPlate', state.govCarPlate);
+      setText('v_govDriver', state.govDriver);
+      setCheck('c_vehBus', state.checks.vehBus);
+      setCheck('c_vehMoto', state.checks.vehMoto);
+      setCheck('c_vehPrivate', state.checks.vehPrivate);
+      setText('v_privateCarPlate', state.privateCarPlate);
+      setCheck('c_vehOther', state.checks.vehOther);
+      setText('v_vehOtherText', state.vehOtherText);
+      setText('v_returnDate', state.returnDate);
+      setText('v_returnTime', state.returnTime);
+
+      setCheck('c_expCentral', state.checks.expCentral);
+      setCheck('c_expPho', state.checks.expPho);
+      setCheck('c_expOrganizer', state.checks.expOrganizer);
+      setCheck('c_expProject', state.checks.expProject);
+      setCheck('c_expNone', state.checks.expNone);
+      setCheck('c_expMaintenance', state.checks.expMaintenance);
+      setCheck('c_expOther', state.checks.expOther);
+      setText('v_expOtherText', state.expOtherText);
+
+      setText('v_sigRequester', state.requesterName);
+      setText('v_sigRequesterPos', state.requesterPos);
+      setText('v_sigReviewer', state.reviewerName);
+      setText('v_sigReviewerPos', state.reviewerPos);
+      setText('v_sigHead', state.headName);
+      setText('v_sigHeadPos', state.headPos);
+      setText('v_sigApprover', state.approverName);
+      setText('v_sigApproverPos', state.approverPos);
+      const approverBlock = document.getElementById('v_approverBlock');
+      if (approverBlock) {
+        const showApp = state.checks && state.checks.showApprover !== false;
+        approverBlock.classList.toggle('hidden', !showApp);
+      }
+
+      // Page 3 (ใบขออนุญาตใช้รถยนต์ราชการ)
+      setCheck('v3_inProv', state.checks.p3InProv);
+      setCheck('v3_outProv', state.checks.p3OutProv);
+      setCheck('v3_normal', state.checks.p3Normal);
+      setCheck('v3_urgent', state.checks.p3Urgent);
+      setText('v3_day', state.p3Day);
+      setText('v3_month', state.p3Month);
+      setText('v3_year', state.p3Year);
+      setText('v3_recipient', state.recipient);
+      setText('v3_requesterName', state.requesterName);
+      setText('v3_requesterPos', state.requesterPos);
+      setText('v3_dest', state.p3Dest);
+      renderSplitTwoLines(state.p3Purpose || '', 'v3_purpose1', 'v3_purpose2', 560);
+      setText('v3_seats', state.p3Seats);
+      setText('v3_startDate', state.p3StartDate);
+      setText('v3_startTime', state.p3StartTime);
+      setText('v3_endDate', state.p3EndDate);
+      setText('v3_endTime', state.p3EndTime);
+      setCheck('v3_fuelCentral', state.checks.p3FuelCentral);
+      setCheck('v3_fuelProject', state.checks.p3FuelProject);
+      setCheck('v3_fuelOrg', state.checks.p3FuelOrg);
+      setCheck('v3_fuelOther', state.checks.p3FuelOther);
+      setText('v3_fuelOtherText', state.p3FuelOtherText);
+      setCheck('v3_reqDriver', state.checks.p3ReqDriver);
+      setCheck('v3_selfDriver', state.checks.p3SelfDriver);
+      setText('v3_backupDriver', state.p3BackupDriver);
+
+      const p3List = document.getElementById('v3_passengersList');
+      if (p3List) {
+        p3List.innerHTML = '';
+        for (let i = 0; i < 12; i++) {
+          const val = (state.team && state.team[i]) || '';
+          const row = document.createElement('div');
+          row.className = 'flex items-baseline gap-1';
+          row.innerHTML = `<span style="width: 22px; text-align: right;">${i + 1}.</span><span class="dotted-flex-left">${val}</span>`;
+          p3List.appendChild(row);
+        }
+      }
+
+      setText('v3_sigRequester', state.requesterName);
+      setText('v3_sigHead', state.headName);
+      setText('v3_sigReviewer', state.reviewerName);
+      setText('v3_sigApprover', state.approverName);
+      setText('v3_unitPlate', state.p3UnitPlate);
+      setText('v3_unitDriver', state.p3UnitDriver);
+      setCheck('v3_gasBenzine', state.checks.p3GasBenzine);
+      setCheck('v3_gas95', state.checks.p3Gas95);
+      setCheck('v3_gasDiesel', state.checks.p3GasDiesel);
+      setText('v3_bookNo', state.p3BookNo);
+      setText('v3_slipNo', state.p3SlipNo);
+      setText('v3_fuelBaht', state.p3FuelBaht);
+      setText('v3_unitReviewer', state.p3UnitReviewer);
+
+      setText('v2_agency', state.agency);
+      setText('v2_docNo', state.docNo);
+      setText('v2_docDate', state.p2Date || state.docDate);
+      setText('v2_recipient', state.recipient);
+      setText('v2_requesterName', state.requesterName);
+      setText('v2_requesterPos', state.requesterPos);
+      setText('v2_orderNo', state.p2OrderNo);
+      setText('v2_orderDate', state.p2OrderDate);
+      setText('v2_eventTitle', state.p2EventTitle);
+      setText('v2_place', state.p2Place);
+      setText('v2_startDate', state.p2StartDate);
+      setText('v2_endDate', state.p2EndDate);
+      setText('v2_reason', state.p2Reason);
+      setText('v2_carBrand', state.carBrand);
+      setText('v2_carPlate', state.privateCarPlate);
+      setText('v2_origin', state.originPlace);
+      setText('v2_dest', state.destPlace);
+      setText('v2_oneWayKm', state.oneWayKm ? Number(state.oneWayKm).toLocaleString('en-US') : '');
+      setText('v2_roundTripKm', state.roundTripKm);
+      setText('v2_fuelAmount', state.fuelAmount);
+      setText('v2_fuelAmountText', state.fuelAmountText);
+      setText('v2_sigRequester', state.requesterName);
+      setText('v2_sigRequesterPos', state.requesterPos);
+    }
+
+    function recalcFuelIfEnabled() {
+      const autoEl = document.getElementById('autoCalcFuel');
+      if (!autoEl || !autoEl.checked) return;
+      const km = parseFloat(state.oneWayKm);
+      if (!Number.isFinite(km) || km <= 0) {
+        state.roundTripKm = '';
+        state.fuelAmount = '';
+        state.fuelAmountText = '';
+      } else {
+        const roundTrip = km * 2;
+        const amount = roundTrip * 4;
+        state.roundTripKm = roundTrip.toLocaleString('en-US');
+        state.fuelAmount = amount.toLocaleString('en-US');
+        state.fuelAmountText = numberToThaiText(amount);
+      }
+      const rtInput = document.querySelector('[data-field="roundTripKm"]');
+      const amtInput = document.querySelector('[data-field="fuelAmount"]');
+      const txtInput = document.querySelector('[data-field="fuelAmountText"]');
+      if (rtInput) rtInput.value = state.roundTripKm;
+      if (amtInput) amtInput.value = state.fuelAmount;
+      if (txtInput) txtInput.value = state.fuelAmountText;
+    }
+
+    function bindEvents() {
+      document.querySelectorAll('[data-field]').forEach(el => {
+        el.addEventListener('input', () => {
+          const key = el.getAttribute('data-field');
+          state[key] = el.value;
+          if (key === 'oneWayKm') recalcFuelIfEnabled();
+          const autoF3 = document.getElementById('autoSyncForm3');
+          if (autoF3 && autoF3.checked && !key.startsWith('p3')) {
+            syncForm1ToForm3();
+            syncInputsFromState();
+          }
+          renderPreview();
+          saveState();
+        });
+      });
+
+      document.querySelectorAll('[data-check]').forEach(el => {
+        el.addEventListener('change', () => {
+          const key = el.getAttribute('data-check');
+          state.checks[key] = el.checked;
+          const autoF3 = document.getElementById('autoSyncForm3');
+          if (autoF3 && autoF3.checked && !key.startsWith('p3')) {
+            syncForm1ToForm3();
+            syncInputsFromState();
+          }
+          renderPreview();
+          saveState();
+        });
+      });
+
+      document.getElementById('chkOverlayMode').addEventListener('change', (e) => {
+        state.overlayMode = e.target.checked;
+        const ovHint = document.getElementById('overlayHint');
+        if (ovHint) ovHint.classList.toggle('hidden', !state.overlayMode);
+        renderTeamEditor();
+        renderPreview();
+        saveState();
+      });
+
+      document.getElementById('btnAddTeam').addEventListener('click', () => {
+        if (!Array.isArray(state.team)) state.team = [];
+        state.team.push('');
+        renderTeamEditor();
+        renderPreview();
+        saveState();
+      });
+
+      document.getElementById('btnClearTeam').addEventListener('click', () => {
+        state.team = [];
+        renderTeamEditor();
+        renderPreview();
+        saveState();
+        showToast('ซ่อนรายชื่อคณะเดินทางแล้ว (เดินทางคนเดียว)');
+      });
+
+      function syncForm1ToForm3() {
+        const parts = (state.docDate || '').trim().split(/\s+/);
+        if (parts.length >= 3) {
+          state.p3Day = parts[0];
+          state.p3Month = parts[1];
+          state.p3Year = parts[2];
+        }
+        state.p3Dest = state.eventPlace;
+        state.p3Purpose = state.eventTitle;
+        state.p3Seats = state.teamCount;
+        state.p3StartDate = state.departDate;
+        state.p3StartTime = (state.departTime || '').replace(/\s*น\.?$/, '');
+        state.p3EndDate = state.returnDate;
+        state.p3EndTime = (state.returnTime || '').replace(/\s*น\.?$/, '');
+        state.p3UnitPlate = state.govCarPlate;
+        state.p3UnitDriver = state.govDriver;
+
+        // Auto-detect ในจังหวัด / นอกจังหวัด จากจังหวัดที่ไป
+        const prov = (state.eventProvince || '').trim();
+        if (prov) {
+          const isTak = prov.includes('ตาก');
+          state.checks.p3InProv = isTak;
+          state.checks.p3OutProv = !isTak;
+        }
+
+        // Auto-sync ประเภทการเบิกจ่ายน้ำมันจากแหล่งงบประมาณแบบที่ 1
+        state.checks.p3FuelCentral = Boolean(state.checks.expCentral);
+        state.checks.p3FuelProject = Boolean(state.checks.expProject);
+        state.checks.p3FuelOrg = Boolean(state.checks.expOrganizer);
+        state.checks.p3FuelOther = Boolean(state.checks.expOther || state.checks.expPho || state.checks.expMaintenance);
+        if (state.checks.expOther && state.expOtherText) {
+          state.p3FuelOtherText = state.expOtherText;
+        } else if (state.checks.expPho) {
+          state.p3FuelOtherText = 'สสจ.ตาก';
+        } else if (state.checks.expMaintenance) {
+          state.p3FuelOtherText = 'เงินบำรุง';
+        } else if (!state.checks.expOther) {
+          state.p3FuelOtherText = '';
+        }
+      }
+
+      document.getElementById('btnSyncForm3').addEventListener('click', () => {
+        syncForm1ToForm3();
+        syncInputsFromState();
+        renderPreview();
+        saveState();
+        showToast('ดึงข้อมูลจากแบบที่ 1 มาใส่ใบขอใช้รถราชการแล้ว');
+      });
+
+      document.getElementById('btnSyncFromForm1').addEventListener('click', () => {
+        state.p2Date = state.docDate;
+        state.p2OrderNo = state.refDocNo;
+        state.p2OrderDate = state.refDocDate;
+        state.p2EventTitle = state.eventTitle;
+        state.p2Place = state.eventPlace;
+        state.destPlace = state.eventPlace;
+        syncInputsFromState();
+        renderPreview();
+        saveState();
+        showToast('ดึงข้อมูลจากแบบที่ 1 มาใส่แบบที่ 2 แล้ว');
+      });
+
+      document.getElementById('btnLoadSample').addEventListener('click', () => {
+        state = JSON.parse(JSON.stringify(SAMPLE_DATA));
+        syncInputsFromState();
+        renderPreview();
+        if (window._applySheetMode) window._applySheetMode(state.sheetMode || 'form1');
+        saveState();
+        showToast('โหลดข้อมูลตัวอย่างจากไฟล์ต้นฉบับแล้ว');
+      });
+
+      document.getElementById('btnClearForm').addEventListener('click', () => {
+        state = JSON.parse(JSON.stringify(EMPTY_DATA));
+        syncInputsFromState();
+        renderPreview();
+        if (window._applySheetMode) window._applySheetMode(state.sheetMode || 'form1');
+        saveState();
+        showToast('ล้างข้อมูลฟอร์มเรียบร้อย');
+      });
+
+      document.getElementById('btnPrintPdf').addEventListener('click', () => {
+        window.print();
+      });
+
+      document.getElementById('btnSaveRecord').addEventListener('click', saveCurrentRecord);
+
+      document.getElementById('btnHistory').addEventListener('click', () => {
+        renderHistoryList();
+        document.getElementById('historyModal').classList.remove('hidden');
+      });
+
+      document.getElementById('btnCloseHistory').addEventListener('click', () => {
+        document.getElementById('historyModal').classList.add('hidden');
+      });
+
+      document.getElementById('btnSettings').addEventListener('click', () => {
+        const gasInp = document.getElementById('gasApiUrlInput');
+        if (gasInp) gasInp.value = getGasApiUrl();
+        renderAgencySettingsList();
+        document.getElementById('settingsModal').classList.remove('hidden');
+      });
+
+      document.getElementById('btnSaveGasUrl').addEventListener('click', () => {
+        const val = (document.getElementById('gasApiUrlInput').value || '').trim();
+        try {
+          localStorage.setItem(GAS_API_KEY, val);
+        } catch (e) {}
+        loadHistoryFromBackend();
+        showToast(val ? 'บันทึกลิงก์เชื่อมต่อ Google Sheet แล้ว' : 'ล้างลิงก์เชื่อมต่อแล้ว');
+      });
+
+      document.getElementById('btnCloseSettings').addEventListener('click', () => {
+        document.getElementById('settingsModal').classList.add('hidden');
+      });
+
+      document.getElementById('btnAddAgency').addEventListener('click', () => {
+        const nameInp = document.getElementById('newAgencyName');
+        const docInp = document.getElementById('newAgencyDocNo');
+        const name = (nameInp.value || '').trim();
+        const docNo = (docInp.value || '').trim();
+        if (!name) {
+          showToast('กรุณากรอกชื่อส่วนราชการ');
+          return;
+        }
+        agencyList.push({ name, docNo });
+        nameInp.value = '';
+        docInp.value = '';
+        persistAgencies();
+        renderAgencyQuickSelect();
+        renderAgencySettingsList();
+        showToast('เพิ่มส่วนราชการเรียบร้อย');
+      });
+
+      const agSearchInp = document.getElementById('agencySearchInput');
+      const agDropdown = document.getElementById('agencyDropdownList');
+      if (agSearchInp && agDropdown) {
+        agSearchInp.addEventListener('focus', () => {
+          renderAgencyQuickSelect(agSearchInp.value);
+          agDropdown.classList.remove('hidden');
+        });
+        agSearchInp.addEventListener('input', () => {
+          renderAgencyQuickSelect(agSearchInp.value);
+          agDropdown.classList.remove('hidden');
+        });
+        document.addEventListener('click', (e) => {
+          if (!agSearchInp.contains(e.target) && !agDropdown.contains(e.target)) {
+            agDropdown.classList.add('hidden');
+          }
+        });
+      }
+
+      function applySheetMode(mode) {
+        state.sheetMode = mode || 'form1';
+        const autoF3 = document.getElementById('autoSyncForm3');
+        if ((state.sheetMode === 'form1_3' || state.sheetMode === 'form3') && autoF3 && autoF3.checked) {
+          syncForm1ToForm3();
+          syncInputsFromState();
+          renderPreview();
+        }
+        const s1 = document.getElementById('sheetForm1');
+        const s2 = document.getElementById('sheetForm2');
+        const s3 = document.getElementById('sheetForm3');
+        const sel = document.getElementById('sheetModeSelect');
+        const badge = document.getElementById('modeBadge');
+        const cTeam = document.getElementById('cardForm1Team');
+        const cDetail = document.getElementById('cardForm1Detail');
+        const cVeh = document.getElementById('cardForm1Veh');
+        const cSign = document.getElementById('cardForm1Sign');
+        const cForm2 = document.getElementById('cardForm2');
+        const cForm3 = document.getElementById('cardForm3');
+        const subj1Wrap = document.getElementById('subject1Wrap');
+
+        if (sel) sel.value = state.sheetMode;
+
+        const showS1 = state.sheetMode === 'form1' || state.sheetMode === 'both' || state.sheetMode === 'form1_3';
+        const showS2 = state.sheetMode === 'both' || state.sheetMode === 'form2';
+        const showS3 = state.sheetMode === 'form1_3' || state.sheetMode === 'form3';
+
+        if (s1) s1.classList.toggle('hidden', !showS1);
+        if (s1) s1.classList.toggle('hidden-sheet', !showS1);
+        if (s2) s2.classList.toggle('hidden', !showS2);
+        if (s2) s2.classList.toggle('hidden-sheet', !showS2);
+        if (s3) s3.classList.toggle('hidden', !showS3);
+        if (s3) s3.classList.toggle('hidden-sheet', !showS3);
+
+        [cDetail, cVeh, subj1Wrap].forEach(el => el && el.classList.toggle('hidden', !showS1));
+        if (cTeam) cTeam.classList.toggle('hidden', !(showS1 || showS3));
+        if (cSign) cSign.classList.toggle('hidden', !(showS1 || showS3));
+        if (cForm2) cForm2.classList.toggle('hidden', !showS2);
+        if (cForm3) cForm3.classList.toggle('hidden', !showS3);
+
+        const count = (showS1 ? 1 : 0) + (showS2 ? 1 : 0) + (showS3 ? 1 : 0);
+        if (badge) badge.textContent = count + ' หน้า (A4)';
+        requestAnimationFrame(() => renderPreview());
+
+        document.querySelectorAll('[data-mode-btn]').forEach(btn => {
+          const active = btn.getAttribute('data-mode-btn') === state.sheetMode;
+          btn.classList.toggle('bg-emerald-600', active);
+          btn.classList.toggle('text-white', active);
+          btn.classList.toggle('border-emerald-600', active);
+          btn.classList.toggle('bg-slate-50', !active);
+          btn.classList.toggle('text-slate-700', !active);
+          btn.classList.toggle('border-slate-200', !active);
+        });
+      }
+
+      document.getElementById('sheetModeSelect').addEventListener('change', (e) => {
+        applySheetMode(e.target.value);
+        saveState();
+      });
+
+      document.querySelectorAll('[data-mode-btn]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          applySheetMode(btn.getAttribute('data-mode-btn'));
+          saveState();
+        });
+      });
+
+      document.querySelectorAll('[data-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const p = btn.getAttribute('data-preset');
+          if (p === 'travel_only') {
+            state.subject1 = 'ขออนุมัติเดินทางไปราชการ';
+            state.checks.purposeTravel = true;
+            state.checks.purposeGovCar = false;
+            state.checks.vehGovCar = false;
+            state.checks.vehPrivate = false;
+            applySheetMode('form1');
+          } else if (p === 'travel_govcar') {
+            state.subject1 = 'ขออนุมัติเดินทางไปราชการ และขออนุมัติใช้รถราชการ';
+            state.checks.purposeTravel = true;
+            state.checks.purposeGovCar = true;
+            state.checks.vehGovCar = true;
+            state.checks.vehPrivate = false;
+            applySheetMode('form1');
+          } else if (p === 'travel_private') {
+            state.subject1 = 'ขออนุมัติเดินทางไปราชการ และขออนุมัติใช้รถยนต์ส่วนบุคคล';
+            state.checks.purposeTravel = true;
+            state.checks.purposeGovCar = false;
+            state.checks.vehPrivate = true;
+            applySheetMode('both');
+          }
+          syncInputsFromState();
+          renderPreview();
+          saveState();
+        });
+      });
+
+      window._applySheetMode = applySheetMode;
+
+      const tabEditor = document.getElementById('tabEditorBtn');
+      const tabPreview = document.getElementById('tabPreviewBtn');
+      const editorPanel = document.getElementById('editorPanel');
+      const previewPanel = document.getElementById('previewPanel');
+
+      tabEditor.addEventListener('click', () => {
+        editorPanel.classList.remove('hidden');
+        previewPanel.classList.add('hidden', 'lg:block');
+        tabEditor.classList.add('bg-white', 'text-emerald-800');
+        tabEditor.classList.remove('text-emerald-100');
+        tabPreview.classList.remove('bg-white', 'text-emerald-800');
+        tabPreview.classList.add('text-emerald-100');
+      });
+
+      tabPreview.addEventListener('click', () => {
+        editorPanel.classList.add('hidden', 'lg:block');
+        previewPanel.classList.remove('hidden');
+        tabPreview.classList.add('bg-white', 'text-emerald-800');
+        tabPreview.classList.remove('text-emerald-100');
+        tabEditor.classList.remove('bg-white', 'text-emerald-800');
+        tabEditor.classList.add('text-emerald-100');
+      });
+    }
+
+    // Init
+    loadState();
+    syncInputsFromState();
+    renderPreview();
+    bindEvents();
+    loadHistoryFromBackend();
+    if (window._applySheetMode) window._applySheetMode(state.sheetMode || 'form1');
+  </script>
+</body>
+</html>
