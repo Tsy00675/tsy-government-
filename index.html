@@ -298,6 +298,12 @@
         <button id="btnClearForm" type="button" class="px-3 py-1.5 rounded-lg bg-rose-600/90 hover:bg-rose-500 text-xs sm:text-sm font-medium transition">
           ล้างข้อมูล
         </button>
+        <button id="btnExportWord" type="button" class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-medium shadow-sm flex items-center gap-1 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Word (.doc)
+        </button>
         <button id="btnPrintPdf" type="button" class="px-4 py-1.5 rounded-lg bg-white text-emerald-800 hover:bg-emerald-50 text-xs sm:text-sm font-semibold shadow-sm flex items-center gap-1.5 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -318,42 +324,68 @@
         </div>
         <button id="btnCloseHistory" type="button" class="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-lg">&times;</button>
       </div>
+      <div class="px-4 pt-3 pb-2 bg-white border-b border-slate-200">
+        <input id="historySearchInput" type="text" placeholder="ค้นหาประวัติ: พิมพ์ชื่อผู้ขอ, เลขที่หนังสือ, เรื่อง หรือวันที่..." class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-xs focus:border-emerald-500 outline-none" />
+      </div>
       <div id="historyList" class="p-4 overflow-y-auto space-y-2.5 flex-1 bg-slate-50"></div>
     </div>
   </div>
 
-  <!-- Settings Modal: เพิ่มส่วนราชการและเลขที่หนังสือ -->
+  <!-- Settings Modal: ตั้งค่าส่วนราชการ & รายชื่อบุคลากร -->
   <div id="settingsModal" class="no-print fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[85vh] flex flex-col overflow-hidden">
       <div class="px-5 py-3.5 bg-emerald-700 text-white flex items-center justify-between">
         <div>
-          <h3 class="font-semibold text-base">ตั้งค่าส่วนราชการและเลขที่หนังสือ</h3>
-          <p class="text-xs text-emerald-100">เพิ่มหน่วยงานไว้เลือกใช้งานด่วนได้</p>
+          <h3 class="font-semibold text-base">ตั้งค่าระบบ (ส่วนราชการ & บุคลากร)</h3>
+          <p class="text-xs text-emerald-100">จัดการหน่วยงาน, ลิงก์ Google Sheet และรายชื่อบุคลากร</p>
         </div>
         <button id="btnCloseSettings" type="button" class="w-8 h-8 rounded-lg hover:bg-white/15 flex items-center justify-center text-lg">&times;</button>
       </div>
-      <div class="p-4 space-y-3 border-b border-slate-200 bg-slate-50">
-        <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 space-y-1.5">
-          <label class="block text-xs font-semibold text-emerald-900">ลิงก์ Google Apps Script Web App (/exec) สำหรับรันบน GitHub</label>
-          <div class="flex gap-2">
-            <input id="gasApiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 rounded-lg border border-emerald-300 px-2.5 py-1 text-xs bg-white focus:border-emerald-500 outline-none" />
-            <button id="btnSaveGasUrl" type="button" class="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-medium shrink-0">บันทึกลิงก์</button>
-          </div>
-          <p class="text-[10px] text-emerald-700">หากเปิดผ่าน Apps Script โดยตรงไม่ต้องกรอก • หากฝากไฟล์บน GitHub Pages ให้วางลิงก์ /exec เพื่อเชื่อมต่อ Google Sheet</p>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อส่วนราชการ (รวมที่อยู่/เบอร์โทร)</label>
-          <input id="newAgencyName" type="text" placeholder="เช่น รพ.สต.บ้าน... อ.ท่าสองยาง จ.ตาก โทร. ..." class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white focus:border-emerald-500 outline-none" />
-        </div>
-        <div class="flex items-end gap-2">
-          <div class="flex-1">
-            <label class="block text-xs font-medium text-slate-600 mb-1">เลขที่ของส่วนราชการ (เช่น ตก 0533/)</label>
-            <input id="newAgencyDocNo" type="text" placeholder="เช่น ตก 0533.01/" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white focus:border-emerald-500 outline-none" />
-          </div>
-          <button id="btnAddAgency" type="button" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium shrink-0">+ เพิ่มส่วนราชการ</button>
-        </div>
+      <div class="flex border-b border-slate-200 bg-slate-100 text-xs font-medium">
+        <button id="tabSetAgencyBtn" type="button" class="flex-1 py-2.5 bg-white text-emerald-800 border-b-2 border-emerald-600">ส่วนราชการ & ลิงก์ Sheet</button>
+        <button id="tabSetStaffBtn" type="button" class="flex-1 py-2.5 text-slate-600 hover:text-emerald-800">จัดการรายชื่อบุคลากร</button>
       </div>
-      <div id="agencySettingsList" class="p-4 overflow-y-auto space-y-2 flex-1 bg-white"></div>
+
+      <!-- Tab 1: Agency & GAS URL -->
+      <div id="panelSetAgency" class="flex-1 flex flex-col overflow-hidden">
+        <div class="p-4 space-y-3 border-b border-slate-200 bg-slate-50">
+          <div class="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 space-y-1.5">
+            <label class="block text-xs font-semibold text-emerald-900">ลิงก์ Google Apps Script Web App (/exec) สำหรับรันบน GitHub</label>
+            <div class="flex gap-2">
+              <input id="gasApiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 rounded-lg border border-emerald-300 px-2.5 py-1 text-xs bg-white focus:border-emerald-500 outline-none" />
+              <button id="btnSaveGasUrl" type="button" class="px-3 py-1 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-medium shrink-0">บันทึกลิงก์</button>
+            </div>
+            <p class="text-[10px] text-emerald-700">หากเปิดผ่าน Apps Script โดยตรงไม่ต้องกรอก • หากฝากไฟล์บน GitHub Pages ให้วางลิงก์ /exec เพื่อเชื่อมต่อ Google Sheet</p>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">ชื่อส่วนราชการ (รวมที่อยู่/เบอร์โทร)</label>
+            <input id="newAgencyName" type="text" placeholder="เช่น รพ.สต.บ้าน... อ.ท่าสองยาง จ.ตาก โทร. ..." class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white focus:border-emerald-500 outline-none" />
+          </div>
+          <div class="flex items-end gap-2">
+            <div class="flex-1">
+              <label class="block text-xs font-medium text-slate-600 mb-1">เลขที่ของส่วนราชการ (เช่น ตก 0533/)</label>
+              <input id="newAgencyDocNo" type="text" placeholder="เช่น ตก 0533.01/" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm bg-white focus:border-emerald-500 outline-none" />
+            </div>
+            <button id="btnAddAgency" type="button" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium shrink-0">+ เพิ่มส่วนราชการ</button>
+          </div>
+        </div>
+        <div id="agencySettingsList" class="p-4 overflow-y-auto space-y-2 flex-1 bg-white"></div>
+      </div>
+
+      <!-- Tab 2: Staff Directory Management -->
+      <div id="panelSetStaff" class="hidden flex-1 flex flex-col overflow-hidden">
+        <div class="p-4 space-y-2.5 border-b border-slate-200 bg-slate-50">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <input id="newStaffName" type="text" placeholder="ชื่อ-สกุล (เช่น นายสมชาย ใจดี)" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs bg-white focus:border-emerald-500 outline-none" />
+            <input id="newStaffPos" type="text" placeholder="ตำแหน่ง" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs bg-white focus:border-emerald-500 outline-none" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="newStaffDept" type="text" placeholder="กลุ่มงาน (ถ้ามี)" class="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs bg-white focus:border-emerald-500 outline-none" />
+            <button id="btnAddStaff" type="button" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium shrink-0">+ เพิ่มบุคลากร</button>
+          </div>
+        </div>
+        <div id="staffSettingsList" class="p-4 overflow-y-auto space-y-2 flex-1 bg-white"></div>
+      </div>
     </div>
   </div>
 
@@ -694,7 +726,13 @@
             <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs">6</span>
             แบบที่ 2: ขออนุญาตใช้รถยนต์ส่วนตัว
           </h2>
-          <button id="btnSyncFromForm1" type="button" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">ดึงข้อมูลจากแบบที่ 1</button>
+          <div class="flex items-center gap-2">
+            <label class="inline-flex items-center gap-1 text-[11px] text-emerald-700 cursor-pointer">
+              <input id="autoSyncForm2" type="checkbox" checked class="rounded text-emerald-600" />
+              <span>ดึงอัตโนมัติ</span>
+            </label>
+            <button id="btnSyncFromForm1" type="button" class="text-[11px] px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">ดึงข้อมูลตอนนี้</button>
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2.5">
@@ -743,6 +781,19 @@
         <div>
           <label class="block text-xs font-medium text-slate-600 mb-1">เหตุผลใช้รถยนต์ส่วนตัวเพื่อ</label>
           <input data-field="p2Reason" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">ตารางระยะทางมาตรฐาน (เลือกเพื่อเติมกม. อัตโนมัติ)</label>
+          <select id="distancePresetSelect" class="w-full rounded-lg border border-emerald-200 bg-emerald-50/60 text-emerald-900 px-2.5 py-1.5 text-xs outline-none">
+            <option value="">-- เลือกจุดหมายปลายทางยอดนิยม (จากท่าสองยาง) --</option>
+            <option value="โรงพยาบาลแม่สอด อ.แม่สอด จ.ตาก|88">อ.แม่สอด / รพ.แม่สอด (ประมาณ 88 กม.)</option>
+            <option value="สำนักงานสาธารณสุขจังหวัดตาก อ.เมืองตาก จ.ตาก|175">สสจ.ตาก / รพ.สมเด็จพระเจ้าตากสินฯ (ประมาณ 175 กม.)</option>
+            <option value="โรงพยาบาลท่าสองยาง อ.ท่าสองยาง จ.ตาก|15">รพ.ท่าสองยาง (ประมาณ 15 กม.)</option>
+            <option value="จ.เชียงใหม่ (อ.เมืองเชียงใหม่)|340">จ.เชียงใหม่ (ประมาณ 340 กม.)</option>
+            <option value="จ.พิษณุโลก (อ.เมืองพิษณุโลก)|310">จ.พิษณุโลก (ประมาณ 310 กม.)</option>
+            <option value="กรุงเทพมหานคร (กระทรวงสาธารณสุข)|590">กรุงเทพมหานคร / กระทรวงสาธารณสุข (ประมาณ 590 กม.)</option>
+          </select>
         </div>
 
         <div class="grid grid-cols-2 gap-2.5">
@@ -1926,6 +1977,71 @@
       }
     }
 
+    function renderStaffSettingsList() {
+      const list = document.getElementById('staffSettingsList');
+      if (!list) return;
+      if (!staffList.length) {
+        list.innerHTML = '<div class="text-center py-6 text-xs text-slate-400">ยังไม่มีรายชื่อบุคลากรที่บันทึกไว้</div>';
+        return;
+      }
+      list.innerHTML = '';
+      staffList.forEach((person, idx) => {
+        const row = document.createElement('div');
+        row.className = 'p-2.5 rounded-xl border border-slate-200 flex items-center justify-between gap-2 bg-slate-50/70';
+        row.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="text-xs font-medium text-slate-800">${person.name}</div>
+            <div class="text-[11px] text-emerald-700">${person.pos || '-'}${person.dept ? ' • ' + person.dept : ''}</div>
+          </div>
+          <button type="button" class="px-2 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs shrink-0">ลบ</button>
+        `;
+        row.querySelector('button').addEventListener('click', () => {
+          staffList.splice(idx, 1);
+          persistStaff();
+          renderStaffSettingsList();
+          showToast('ลบรายชื่อบุคลากรแล้ว');
+        });
+        list.appendChild(row);
+      });
+    }
+
+    function exportToWord() {
+      const sheets = Array.from(document.querySelectorAll('.a4-sheet:not(.hidden-sheet):not(.hidden)'));
+      if (!sheets.length) return;
+      const bodyHtml = sheets.map((sh, i) => {
+        const br = i > 0 ? '<br clear="all" style="page-break-before:always;" />' : '';
+        return br + '<div class="word-page">' + sh.innerHTML + '</div>';
+      }).join('');
+      const docHtml = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8" />
+<title>ขออนุญาตไปราชการ</title>
+<style>
+  @page { size: A4 portrait; margin: 1.2cm 1.6cm 1.0cm 2.0cm; }
+  body { font-family: "TH SarabunPSK", "Sarabun", sans-serif; font-size: 16pt; line-height: 1.25; color: #000; }
+  .word-page { width: 100%; }
+  .doc-title { font-size: 24pt; font-weight: bold; text-align: center; }
+  .doc-label-bold { font-weight: bold; }
+  .dotted-fill, .dotted-fill-left, .dotted-flex, .dotted-flex-left, .dotted-flex-fixed { border-bottom: 1px dotted #333; padding: 0 4px; }
+  .doc-checkbox { display: inline-block; width: 12px; height: 12px; border: 1px solid #000; text-align: center; font-size: 10pt; margin-right: 4px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>${bodyHtml}</body>
+</html>`;
+      const blob = new Blob(['\ufeff', docHtml], { type: 'application/msword;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (state.docNo ? state.docNo.replace(/[\/\s]+/g, '_') + '_' : '') + 'ขออนุญาตไปราชการ.doc';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('ดาวน์โหลดไฟล์ Word (.doc) แล้ว');
+    }
+
     function loadHistoryFromBackend() {
       renderAgencyQuickSelect();
       if (isGAS) {
@@ -2058,24 +2174,46 @@
 
     function renderHistoryList() {
       const list = document.getElementById('historyList');
+      const searchEl = document.getElementById('historySearchInput');
+      const q = (searchEl ? searchEl.value : '').trim().toLowerCase();
+
       if (!historyRecords.length) {
         list.innerHTML = '<div class="text-center py-8 text-sm text-slate-400">ยังไม่มีประวัติการบันทึก กดปุ่ม "บันทึกลง Sheet" เพื่อเก็บรายการ</div>';
         return;
       }
+
+      const filtered = historyRecords
+        .map((rec, origIdx) => ({ rec, origIdx }))
+        .filter(({ rec }) => {
+          if (!q) return true;
+          const d = rec.data || {};
+          const hay = [d.eventTitle, d.p2EventTitle, d.p3Purpose, d.subject1, d.docNo, d.requesterName, d.docDate, d.eventDates, d.eventPlace, d.p2Place, d.p2StartDate, d.p3Dest, d.p3StartDate]
+            .filter(Boolean).join(' ').toLowerCase();
+          return hay.includes(q);
+        });
+
+      if (!filtered.length) {
+        list.innerHTML = '<div class="text-center py-8 text-sm text-slate-400">ไม่พบประวัติที่ตรงกับคำค้นหา</div>';
+        return;
+      }
+
       list.innerHTML = '';
-      historyRecords.forEach((rec, idx) => {
+      filtered.forEach(({ rec, origIdx }) => {
         const d = rec.data || {};
         const card = document.createElement('div');
-        card.className = 'bg-white p-3 rounded-xl border border-slate-200 flex items-center justify-between gap-3';
+        card.className = 'bg-white p-3 rounded-xl border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5';
+        const tripTitle = d.eventTitle || d.p2EventTitle || d.p3Purpose || d.subject1 || 'ขออนุญาตเดินทางไปราชการ';
+        const tripPlace = d.eventPlace || d.p2Place || d.p3Dest || '-';
+        const tripDates = d.eventDates || (d.p2StartDate ? (d.p2StartDate + (d.p2EndDate ? ' - ' + d.p2EndDate : '')) : (d.p3StartDate || '-'));
         card.innerHTML = `
           <div class="min-w-0 flex-1">
-            <div class="font-medium text-sm text-slate-800 truncate">${d.subject1 || 'ขออนุญาตเดินทางไปราชการ'}</div>
-            <div class="text-xs text-slate-500 mt-0.5">${d.docNo || '-'} • ${d.requesterName || '-'} • ${d.eventDates || d.p2StartDate || '-'}</div>
-            <div class="text-[11px] text-slate-400 mt-0.5">บันทึกเมื่อ: ${rec.savedAt || '-'}</div>
+            <div class="font-medium text-sm text-slate-800 truncate">${tripTitle}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${tripPlace} • ${tripDates} • ${d.requesterName || '-'} (${d.docNo || '-'})</div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0">
-            <button type="button" data-action="load" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium">โหลดมาแก้ไข</button>
-            <button type="button" data-action="delete" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-medium">ลบ</button>
+            <button type="button" data-action="load" class="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium">โหลดแก้ไข</button>
+            <button type="button" data-action="dup" class="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-medium">ทำสำเนาใบใหม่</button>
+            <button type="button" data-action="delete" class="px-2 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-medium">ลบ</button>
           </div>
         `;
         card.querySelector('[data-action="load"]').addEventListener('click', () => {
@@ -2087,8 +2225,34 @@
           document.getElementById('historyModal').classList.add('hidden');
           showToast('โหลดข้อมูลจากประวัติแล้ว');
         });
+        card.querySelector('[data-action="dup"]').addEventListener('click', () => {
+          const cloned = Object.assign(JSON.parse(JSON.stringify(EMPTY_DATA)), JSON.parse(JSON.stringify(d)));
+          // Keep agency prefix (e.g. "ตก 0533/") and clear date fields for the new memo
+          const slashIdx = (cloned.docNo || '').indexOf('/');
+          if (slashIdx >= 0) cloned.docNo = cloned.docNo.slice(0, slashIdx + 1);
+          cloned.docDate = '';
+          cloned.eventDates = '';
+          cloned.departDate = '';
+          cloned.returnDate = '';
+          cloned.p2Date = '';
+          cloned.p2StartDate = '';
+          cloned.p2EndDate = '';
+          cloned.p3Day = '';
+          cloned.p3Month = '';
+          cloned.p3Year = '';
+          cloned.p3StartDate = '';
+          cloned.p3EndDate = '';
+          cloned.overlayMode = false;
+          state = cloned;
+          syncInputsFromState();
+          renderPreview();
+          if (window._applySheetMode) window._applySheetMode(state.sheetMode || 'form1');
+          saveState();
+          document.getElementById('historyModal').classList.add('hidden');
+          showToast('คัดลอกเป็นใบใหม่แล้ว แก้ไขวันที่และเลขที่หนังสือได้เลย');
+        });
         card.querySelector('[data-action="delete"]').addEventListener('click', () => {
-          deleteHistoryRecord(rec, idx);
+          deleteHistoryRecord(rec, origIdx);
         });
         list.appendChild(card);
       });
@@ -2475,6 +2639,11 @@
             syncForm1ToForm3();
             syncInputsFromState();
           }
+          const autoF2 = document.getElementById('autoSyncForm2');
+          if (autoF2 && autoF2.checked && !key.startsWith('p2') && !key.startsWith('p3') && key !== 'oneWayKm' && key !== 'roundTripKm' && key !== 'fuelAmount' && key !== 'fuelAmountText' && key !== 'carBrand' && key !== 'originPlace' && key !== 'destPlace') {
+            syncForm1ToForm2();
+            syncInputsFromState();
+          }
           renderPreview();
           saveState();
         });
@@ -2518,6 +2687,17 @@
         saveState();
         showToast('ซ่อนรายชื่อคณะเดินทางแล้ว (เดินทางคนเดียว)');
       });
+
+      function syncForm1ToForm2() {
+        state.p2Date = state.docDate;
+        state.p2OrderNo = state.refDocNo;
+        state.p2OrderDate = state.refDocDate;
+        state.p2EventTitle = state.eventTitle;
+        state.p2Place = state.eventPlace;
+        state.destPlace = state.eventPlace;
+        state.p2StartDate = state.departDate || state.eventDates;
+        state.p2EndDate = state.returnDate || state.eventDates;
+      }
 
       function syncForm1ToForm3() {
         const parts = (state.docDate || '').trim().split(/\s+/);
@@ -2599,6 +2779,61 @@
         showToast('ล้างข้อมูลฟอร์มเรียบร้อย');
       });
 
+      document.getElementById('btnExportWord').addEventListener('click', exportToWord);
+
+      document.getElementById('historySearchInput').addEventListener('input', renderHistoryList);
+
+      document.getElementById('distancePresetSelect').addEventListener('change', (e) => {
+        const val = e.target.value;
+        if (!val) return;
+        const [dest, km] = val.split('|');
+        state.destPlace = dest;
+        state.oneWayKm = km;
+        recalcFuelIfEnabled();
+        syncInputsFromState();
+        renderPreview();
+        saveState();
+        showToast(`เติมระยะทาง ${km} กม. และคำนวณค่าน้ำมันแล้ว`);
+      });
+
+      const tabSetAg = document.getElementById('tabSetAgencyBtn');
+      const tabSetSt = document.getElementById('tabSetStaffBtn');
+      const panSetAg = document.getElementById('panelSetAgency');
+      const panSetSt = document.getElementById('panelSetStaff');
+      tabSetAg.addEventListener('click', () => {
+        panSetAg.classList.remove('hidden');
+        panSetSt.classList.add('hidden');
+        tabSetAg.classList.add('bg-white', 'text-emerald-800', 'border-b-2', 'border-emerald-600');
+        tabSetSt.classList.remove('bg-white', 'text-emerald-800', 'border-b-2', 'border-emerald-600');
+      });
+      tabSetSt.addEventListener('click', () => {
+        renderStaffSettingsList();
+        panSetSt.classList.remove('hidden');
+        panSetAg.classList.add('hidden');
+        tabSetSt.classList.add('bg-white', 'text-emerald-800', 'border-b-2', 'border-emerald-600');
+        tabSetAg.classList.remove('bg-white', 'text-emerald-800', 'border-b-2', 'border-emerald-600');
+      });
+
+      document.getElementById('btnAddStaff').addEventListener('click', () => {
+        const nEl = document.getElementById('newStaffName');
+        const pEl = document.getElementById('newStaffPos');
+        const dEl = document.getElementById('newStaffDept');
+        const name = (nEl.value || '').trim();
+        const pos = (pEl.value || '').trim();
+        const dept = (dEl.value || '').trim();
+        if (!name) {
+          showToast('กรุณากรอกชื่อ-สกุล');
+          return;
+        }
+        rememberStaffPerson(name, pos, dept, true);
+        persistStaff();
+        nEl.value = '';
+        pEl.value = '';
+        dEl.value = '';
+        renderStaffSettingsList();
+        showToast('เพิ่มรายชื่อบุคลากรเรียบร้อย');
+      });
+
       document.getElementById('btnPrintPdf').addEventListener('click', () => {
         window.print();
       });
@@ -2675,6 +2910,12 @@
         const autoF3 = document.getElementById('autoSyncForm3');
         if ((state.sheetMode === 'form1_3' || state.sheetMode === 'form3') && autoF3 && autoF3.checked) {
           syncForm1ToForm3();
+          syncInputsFromState();
+          renderPreview();
+        }
+        const autoF2 = document.getElementById('autoSyncForm2');
+        if ((state.sheetMode === 'both' || state.sheetMode === 'form2') && autoF2 && autoF2.checked) {
+          syncForm1ToForm2();
           syncInputsFromState();
           renderPreview();
         }
