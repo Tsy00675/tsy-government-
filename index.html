@@ -97,11 +97,12 @@
       flex: 1;
       min-width: 16mm;
       border-bottom: 0.75px dotted #475569;
-      padding: 0 5px;
-      line-height: 1.25;
+      padding: 2px 5px 0 5px;
+      line-height: 1.35;
       text-align: center;
       white-space: nowrap;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: visible;
       text-overflow: ellipsis;
     }
 
@@ -118,11 +119,12 @@
       flex: 1;
       min-width: 16mm;
       border-bottom: 0.75px dotted #475569;
-      padding: 0 5px;
-      line-height: 1.25;
+      padding: 2px 5px 0 5px;
+      line-height: 1.35;
       text-align: left;
       white-space: nowrap;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: visible;
       text-overflow: ellipsis;
     }
 
@@ -436,7 +438,12 @@
 
         <div>
           <label class="block text-xs font-medium text-slate-600 mb-1">เรียน</label>
-          <input data-field="recipient" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          <input data-field="recipient" placeholder="เว้นว่างไว้ หรือพิมพ์ / กดเลือกด้านล่าง" type="text" class="w-full rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none" />
+          <div class="flex flex-wrap gap-1.5 mt-1.5">
+            <button type="button" data-recipient-preset="นายอำเภอท่าสองยาง" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">นายอำเภอท่าสองยาง</button>
+            <button type="button" data-recipient-preset="สาธารณสุขอำเภอท่าสองยาง" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">สาธารณสุขอำเภอท่าสองยาง</button>
+            <button type="button" data-recipient-preset="" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-700 border border-slate-200">เว้นว่าง</button>
+          </div>
         </div>
       </div>
 
@@ -801,6 +808,16 @@
           <label class="inline-flex items-center gap-1 cursor-pointer"><input data-check="p3Urgent" type="checkbox" class="rounded text-emerald-600" /><span>แผนด่วน</span></label>
         </div>
 
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">เรียน (ใบขอรถยนต์ราชการ)</label>
+          <input data-field="p3Recipient" placeholder="เว้นว่างไว้ หรือพิมพ์ / กดเลือกด้านล่าง" type="text" class="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs" />
+          <div class="flex flex-wrap gap-1.5 mt-1">
+            <button type="button" data-p3-rec="สาธารณสุขอำเภอท่าสองยาง" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">สาธารณสุขอำเภอท่าสองยาง</button>
+            <button type="button" data-p3-rec="นายอำเภอท่าสองยาง" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200">นายอำเภอท่าสองยาง</button>
+            <button type="button" data-p3-rec="" class="text-[11px] px-2 py-0.5 rounded bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-700 border border-slate-200">เว้นว่าง</button>
+          </div>
+        </div>
+
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="block text-xs font-medium text-slate-600 mb-1">วันที่</label>
@@ -1116,7 +1133,7 @@
           <span id="v2_recipient" class="ml-1.5"></span>
         </div>
 
-        <!-- เนื้อหา -->
+        <!-- เนื้อหา (เรียงบรรทัดและเส้นประคงที่ตามต้นฉบับ) -->
         <div class="doc-row" style="padding-left: 14mm;">
           <span>ด้วยข้าพเจ้า</span>
           <span id="v2_requesterName" class="dotted-flex"></span>
@@ -1124,28 +1141,78 @@
           <span id="v2_requesterPos" class="dotted-flex"></span>
         </div>
 
-        <div class="mb-2" style="line-height: 1.65;">
-          <span>ได้รับคำสั่ง/บันทึก</span><span id="v2_orderNo" class="dotted-fill" style="width: 56mm;"></span><span>ลงวันที่</span><span id="v2_orderDate" class="dotted-fill" style="width: 46mm;"></span>
+        <div class="doc-row">
+          <span>ได้รับคำสั่ง/บันทึก</span>
+          <span id="v2_orderNo" class="dotted-flex"></span>
+          <span>ลงวันที่</span>
+          <span id="v2_orderDate" class="dotted-flex"></span>
+        </div>
+
+        <div class="doc-row">
           <span>ให้ข้าพเจ้าเดินทางไปราชการ</span>
-          <span id="v2_eventTitle" style="border-bottom: 0.75px dotted #475569; padding: 0 5px;"></span>
-          <span> ที่</span><span id="v2_place" class="dotted-fill" style="width: 96mm;"></span>
-          <span>ระหว่างวันที่</span><span id="v2_startDate" class="dotted-fill" style="width: 42mm;"></span><span>ถึงวันที่</span><span id="v2_endDate" class="dotted-fill" style="width: 42mm;"></span>
+          <span id="v2_eventTitle1" class="dotted-flex-fixed"></span>
+        </div>
+        <div class="doc-row">
+          <span id="v2_eventTitle2" class="dotted-flex-fixed"></span>
         </div>
 
-        <div class="doc-row mb-2">
+        <div class="doc-row">
+          <span>ที่</span>
+          <span id="v2_place" class="dotted-flex-left"></span>
+        </div>
+
+        <div class="doc-row">
+          <span>ระหว่างวันที่</span>
+          <span id="v2_startDate" class="dotted-flex"></span>
+          <span>ถึงวันที่</span>
+          <span id="v2_endDate" class="dotted-flex"></span>
+        </div>
+
+        <div class="doc-row">
           <span>ในการเดินทางไปราชการในครั้งนี้เหตุผลใช้รถยนต์ส่วนตัวเพื่อ</span>
-          <span id="v2_reason" class="dotted-flex-left"></span>
+          <span id="v2_reason1" class="dotted-flex-fixed"></span>
+        </div>
+        <div id="v2_reason2Row" class="doc-row hidden">
+          <span id="v2_reason2" class="dotted-flex-fixed"></span>
         </div>
 
-        <div class="mb-3" style="text-indent: 14mm; line-height: 1.65;">
-          <span>ข้าพเจ้ามีความจำเป็นต้องใช้รถยนต์ส่วนตัว ยี่ห้อ</span><span id="v2_carBrand" class="dotted-fill" style="width: 34mm;"></span>
-          <span>หมายเลขทะเบียน</span><span id="v2_carPlate" class="dotted-fill" style="width: 36mm;"></span>
-          <span>ใช้เป็นพาหนะในการเดินทาง ระยะทางจาก</span><span id="v2_origin" class="dotted-fill" style="width: 72mm;"></span>
-          <span>ถึง</span><span id="v2_dest" class="dotted-fill" style="width: 80mm;"></span>
-          <span>ระยะทางประมาณ</span><span id="v2_oneWayKm" class="dotted-fill" style="width: 24mm;"></span><span>กิโลเมตร</span>
-          <span>รวมระยะทางไป-กลับประมาณ</span><span id="v2_roundTripKm" class="dotted-fill" style="width: 26mm;"></span><span>กิโลเมตร</span>
-          <span>ข้าพเจ้าขอใช้สิทธิ์ในการขอเบิกเงินค่าชดเชยน้ำมันเชื้อเพลิงตามระเบียบฯ กิโลเมตรละ 4 บาท รวมเป็นเงิน</span><span id="v2_fuelAmount" class="dotted-fill" style="width: 24mm;"></span><span>บาท (<span id="v2_fuelAmountText" class="dotted-fill" style="width: 48mm;"></span>)</span>
-          <span>โดยข้าพเจ้าจะส่งหลักฐานขอเบิกเมื่อกลับจากไปราชการกลับมาแล้ว ทั้งนี้ถ้าหากเกิดอุบัติเหตุจากการที่นำรถยนต์ส่วนตัวไปราชการครั้งนี้ ทางราชการไม่ต้องรับผิดชอบใด ๆ ทั้งสิ้น</span>
+        <div class="doc-row">
+          <span>ข้าพเจ้ามีความจำเป็นต้องใช้รถยนต์ส่วนตัว ยี่ห้อ</span>
+          <span id="v2_carBrand" class="dotted-flex"></span>
+          <span>หมายเลขทะเบียน</span>
+          <span id="v2_carPlate" class="dotted-flex"></span>
+        </div>
+
+        <div class="doc-row">
+          <span>ใช้เป็นพาหนะ ในการเดินทาง ระยะทางจาก</span>
+          <span id="v2_origin" class="dotted-flex-left"></span>
+        </div>
+
+        <div class="doc-row">
+          <span>ถึง</span>
+          <span id="v2_dest" class="dotted-flex-left"></span>
+          <span>ระยะทางประมาณ</span>
+          <span id="v2_oneWayKm" class="dotted-fill" style="width: 18mm;"></span>
+          <span>กิโลเมตร</span>
+        </div>
+
+        <div class="doc-row">
+          <span>รวมระยะทางไป-กลับประมาณ</span>
+          <span id="v2_roundTripKm" class="dotted-fill" style="width: 22mm;"></span>
+          <span>กิโลเมตร ข้าพเจ้าขอใช้สิทธิ์ในการขอเบิกเงินค่าชดเชยน้ำมัน</span>
+        </div>
+
+        <div class="doc-row">
+          <span>เชื้อเพลิงตามระเบียบฯ กิโลเมตรละ 4 บาท รวมเป็นเงิน</span>
+          <span id="v2_fuelAmount" class="dotted-fill" style="width: 20mm;"></span>
+          <span>บาท (</span>
+          <span id="v2_fuelAmountText" class="dotted-flex"></span>
+          <span>)</span>
+        </div>
+
+        <div class="mb-3" style="line-height: 1.5;">
+          <div>โดยข้าพเจ้าจะส่งหลักฐานขอเบิกเมื่อกลับจากไปราชการกลับมาแล้ว &nbsp;ทั้งนี้ถ้าหากเกิดอุบัติเหตุจากการที่นำ</div>
+          <div>รถยนต์ส่วนตัวไปราชการครั้งนี้ ทางราชการไม่ต้องรับผิดชอบใด ๆ ทั้งสิ้น</div>
         </div>
 
         <!-- จึงเรียนมาเพื่อโปรดพิจารณา -->
@@ -1160,12 +1227,13 @@
           <div>
             <div class="doc-label-bold mb-4">ความเห็นของหัวหน้ากลุ่มงาน</div>
             <div class="border-b border-dotted border-slate-600 h-6 mb-2" style="width: 68mm;"></div>
+            <div class="mb-1 text-center" style="width: 68mm;">(<span class="dotted-fill" style="width: 52mm;"></span>)</div>
             <div>ตำแหน่ง<span class="dotted-fill" style="width: 54mm;"></span></div>
           </div>
           <div class="text-center">
             <div class="mb-1">(ลงชื่อ)<span class="dotted-fill" style="width: 46mm;"></span>ผู้ขออนุญาต</div>
             <div class="mb-1">(<span id="v2_sigRequester" class="dotted-fill" style="width: 46mm;"></span>)</div>
-            <div>ตำแหน่ง<span id="v2_sigRequesterPos" class="dotted-fill" style="width: 48mm;"></span></div>
+            <div class="flex items-baseline justify-center whitespace-nowrap"><span>ตำแหน่ง</span><span id="v2_sigRequesterPos" class="dotted-fill whitespace-nowrap" style="min-width: 48mm;"></span></div>
           </div>
         </div>
 
@@ -1184,7 +1252,7 @@
       <!-- ======================== PAGE 3: แบบที่ 3 ใบขออนุญาตใช้รถยนต์ราชการ ======================== -->
       <article id="sheetForm3" class="a4-sheet hidden hidden-sheet">
         <div class="text-center font-bold mb-1.5" style="font-size: 18px !important;">
-          ใบอนุญาตใช้รถส่วนกลาง/ รถรับรอง /รถรับรองประจำจังหวัด
+          ใบอนุญาตใช้รถส่วนกลาง / รถรับรอง / รถรับรองประจำจังหวัด
         </div>
 
         <div class="flex justify-center items-center gap-5 mb-2.5">
@@ -1213,7 +1281,7 @@
         </div>
 
         <div class="doc-row">
-          <span>ขออนุญาตใช้รถยนต์(ไปไหน)</span>
+          <span>ขออนุญาตใช้รถยนต์</span>
           <span id="v3_dest" class="dotted-flex-fixed"></span>
         </div>
 
@@ -1257,10 +1325,10 @@
         </div>
 
         <div class="mb-1">รายชื่อผู้โดยสารดังนี้</div>
-        <div id="v3_passengersList" class="grid grid-cols-2 gap-x-5 gap-y-0.5 mb-2.5" style="padding-left: 2mm;"></div>
+        <div id="v3_passengersList" class="grid grid-cols-2 gap-x-5 gap-y-0.5 mb-6" style="padding-left: 2mm;"></div>
 
         <!-- ลายเซ็น 3 ส่วน (จัดแนวคอลัมน์ตรงกันทุกบรรทัด) -->
-        <div class="space-y-2.5 ml-auto mb-2.5" style="width: 96mm;">
+        <div class="space-y-5 ml-auto mb-4" style="width: 96mm;">
           <div>
             <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;">(ลงชื่อ)</span><span class="dotted-fill" style="width: 48mm;"></span><span class="ml-1.5 whitespace-nowrap">ผู้ขออนุญาต</span></div>
             <div class="flex items-baseline"><span style="width: 36px; flex-shrink: 0;"></span><span>(</span><span id="v3_sigRequester" class="dotted-fill" style="width: 45mm;"></span><span>)</span></div>
@@ -1276,7 +1344,7 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 items-start mb-2">
+        <div class="grid grid-cols-2 items-start mb-5">
           <div class="text-left pl-4">(ลงนามผู้มีอำนาจสั่งใช้รถ)</div>
           <div class="text-center">
             <div class="mb-2">อนุมัติ</div>
@@ -1429,6 +1497,7 @@
       roundTripKm: '1,250',
       fuelAmount: '5,000',
       fuelAmountText: 'ห้าพันบาทถ้วน',
+      p3Recipient: '',
       p3Day: '5',
       p3Month: 'พฤศจิกายน',
       p3Year: '2569',
@@ -1532,6 +1601,7 @@
       roundTripKm: '',
       fuelAmount: '',
       fuelAmountText: '',
+      p3Recipient: '',
       p3Day: '',
       p3Month: '',
       p3Year: '',
@@ -2298,7 +2368,7 @@
       setText('v3_day', state.p3Day);
       setText('v3_month', state.p3Month);
       setText('v3_year', state.p3Year);
-      setText('v3_recipient', state.recipient);
+      setText('v3_recipient', state.p3Recipient);
       setText('v3_requesterName', state.requesterName);
       setText('v3_requesterPos', state.requesterPos);
       setText('v3_dest', state.p3Dest);
@@ -2320,13 +2390,13 @@
       const p3List = document.getElementById('v3_passengersList');
       if (p3List) {
         p3List.innerHTML = '';
-        for (let i = 0; i < 12; i++) {
-          const val = (state.team && state.team[i]) || '';
+        const p3Arr = Array.isArray(state.team) ? state.team : [];
+        p3Arr.forEach((val, i) => {
           const row = document.createElement('div');
           row.className = 'flex items-baseline gap-1';
-          row.innerHTML = `<span style="width: 22px; text-align: right;">${i + 1}.</span><span class="dotted-flex-left">${val}</span>`;
+          row.innerHTML = `<span style="width: 22px; text-align: right;">${i + 1}.</span><span class="dotted-flex-left">${val || ''}</span>`;
           p3List.appendChild(row);
-        }
+        });
       }
 
       setText('v3_sigRequester', state.requesterName);
@@ -2351,11 +2421,14 @@
       setText('v2_requesterPos', state.requesterPos);
       setText('v2_orderNo', state.p2OrderNo);
       setText('v2_orderDate', state.p2OrderDate);
-      setText('v2_eventTitle', state.p2EventTitle);
+      renderSplitTwoLines(state.p2EventTitle || '', 'v2_eventTitle1', 'v2_eventTitle2', 420);
       setText('v2_place', state.p2Place);
       setText('v2_startDate', state.p2StartDate);
       setText('v2_endDate', state.p2EndDate);
-      setText('v2_reason', state.p2Reason);
+      renderSplitTwoLines(state.p2Reason || '', 'v2_reason1', 'v2_reason2', 260);
+      const r2Row = document.getElementById('v2_reason2Row');
+      const r2El = document.getElementById('v2_reason2');
+      if (r2Row && r2El) r2Row.classList.toggle('hidden', !r2El.textContent.trim());
       setText('v2_carBrand', state.carBrand);
       setText('v2_carPlate', state.privateCarPlate);
       setText('v2_origin', state.originPlace);
@@ -2660,6 +2733,24 @@
       document.querySelectorAll('[data-mode-btn]').forEach(btn => {
         btn.addEventListener('click', () => {
           applySheetMode(btn.getAttribute('data-mode-btn'));
+          saveState();
+        });
+      });
+
+      document.querySelectorAll('[data-p3-rec]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.p3Recipient = btn.getAttribute('data-p3-rec') || '';
+          syncInputsFromState();
+          renderPreview();
+          saveState();
+        });
+      });
+
+      document.querySelectorAll('[data-recipient-preset]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.recipient = btn.getAttribute('data-recipient-preset') || '';
+          syncInputsFromState();
+          renderPreview();
           saveState();
         });
       });
